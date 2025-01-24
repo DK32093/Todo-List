@@ -4,7 +4,7 @@ class toDoGroup {
     groupTitle;
     subTitle;
     tasksList;
-    constructor(groupTitle = "General", subTitle = "My general tasks") {
+    constructor(groupTitle, subTitle) {
       this.groupTitle = groupTitle;
       this.subTitle = subTitle;
       this.tasksList = [];
@@ -27,7 +27,7 @@ class toDoTask {
     priority;
     notes;
     checklist;
-    constructor(taskTitle = "Task #1", desctiption = "My first task", priority = "high") {
+    constructor(taskTitle, desctiption, priority) {
         this.taskTitle = taskTitle;
         this.description = desctiption;
         this.dueDate = "";
@@ -53,5 +53,4 @@ class toDoTask {
     }
 }
 
-
-  export { toDoGroup, toDoTask }
+export { toDoGroup, toDoTask }

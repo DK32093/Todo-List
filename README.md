@@ -1,2 +1,1 @@
-# webpack-template
-A basic template for my projects using Webpack
+A todo list application for practicing OOP and ESM principals.
