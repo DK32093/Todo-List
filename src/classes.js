@@ -1,8 +1,9 @@
 import logMessage from "./logger";
 
 class groupList {
-    constructor(groupArray) {
-        this.groupArray = []
+    constructor(name) {
+        this.name = name;
+        this.groupArray = [];
     }
 
     addgroup(group) {
