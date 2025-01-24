@@ -1,5 +1,15 @@
 import logMessage from "./logger";
 
+class groupList {
+    constructor(groupArray) {
+        this.groupArray = []
+    }
+
+    addgroup(group) {
+        this.groupArray.push(group)
+    }
+}
+
 class toDoGroup {
     groupTitle;
     subTitle;
@@ -27,6 +37,7 @@ class toDoTask {
     priority;
     notes;
     checklist;
+    status;
     constructor(taskTitle, desctiption, priority) {
         this.taskTitle = taskTitle;
         this.description = desctiption;
@@ -34,6 +45,7 @@ class toDoTask {
         this.priority = priority;
         this.notes = "";
         this.checklist = [];
+        this.status = "N"
     }
 
     setDate(date) {
@@ -48,9 +60,17 @@ class toDoTask {
         this.checklist.push(item)
     }
 
-    getChecklist() {
-        logMessage(this.checklist)
+    switchStatus() {
+        if (this.status === "N") {
+            this.status = "Y"
+            return
+        }
+        this.status = "N"
+    }
+
+    switchPriority(choice) {
+        this.priority = choice
     }
 }
 
-export { toDoGroup, toDoTask }
+export { groupList, toDoGroup, toDoTask }
