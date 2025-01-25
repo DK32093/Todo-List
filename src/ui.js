@@ -42,6 +42,22 @@ function createTaskCard(task) {
     return taskCard
 }
 
+function createCheckInput() {
+    const newCheckForm = document.createElement("form");
+    const newCheckInput = document.createElement("input");
+    const newCheckInputLab = document.createElement("label");
+    newCheckInputLab.setAttribute("for", "newCheckInput")
+    newCheckInputLab.innerText = "Add to checklist: "
+    Object.assign(newCheckInput, {
+        type: "text",
+        id: "newCheckInput",
+        name: "newCheckInput",
+        placeholder: "New checklist item"
+    })
+    newCheckForm.append(newCheckInputLab, newCheckInput)
+    return newCheckForm
+}
+
 function createTaskForm(e) {
     const taskFormDiv = document.createElement("div")
     taskFormDiv.setAttribute("class", "taskFormDiv")
@@ -104,11 +120,22 @@ function createTaskForm(e) {
         name: "notes"
     })
 
+    const newCheckButton = document.createElement("button")
+    newCheckButton.innerText = "Add checklist item"
+    Object.assign(newCheckButton, {
+        class: "newCheckButton",
+        type: "button"
+    })
+    newCheckButton.addEventListener("click", (e) => {
+        const closestTaskForm  = e.target.closest(".taskFormDiv")
+        closestTaskForm.append(createCheckInput())
+    });
+
     newTaskForm.append(taskTitleLab, taskTitle, 
                        descriptionLab, description,
                        dueDateLab, dueDate,
                        priorityLab, priority,
-                       notesLab, notes)
+                       notesLab, notes, newCheckButton)
 
     taskFormDiv.append(newTaskForm)
     const group = e.target.closest(".groupCard")
