@@ -1,4 +1,4 @@
-import logMessage from "./logger";
+import {createTaskForm} from "./ui.js";
 
 class groupList {
     constructor(name) {
@@ -21,14 +21,18 @@ class toDoGroup {
       this.tasksList = [];
     }
 
+    createAddButton() {
+        const button = document.createElement("button");
+        button.innerText = "Add new ask";
+        button.addEventListener("click", (e) => {
+            createTaskForm(e);
+        });
+        return button;
+    }
+
     addTask(task) {
         this.tasksList.push(task)
     }
-
-    getTasks() {
-        logMessage(this.tasksList)
-    }
-
   }
 
 class toDoTask {

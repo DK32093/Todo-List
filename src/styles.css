@@ -2,7 +2,18 @@ body {
     background-color: blue;
 }
 
--groupDisplay {
-    height: 100%;
+.groupCard {
+    width: 70%;
+    border: solid 2px black;
 }
 
+.taskCard {
+    display: flex;
+    gap: 1rem;
+    border: solid 2px rgb(215, 11, 11);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
