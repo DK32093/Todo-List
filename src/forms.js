@@ -1,9 +1,8 @@
 // Forms for creating new collections, groups, tasks, 
 // and checklist items
 
-import { newTaskFromForm } from "./display.js"
-
-
+import { defaultLibrary } from "./classes.js"
+import { newGroupFromForm, newTaskFromForm } from "./display.js"
 
 function createGroupForm() { // Add selection of collections in library
     const dialog = document.createElement("dialog")
@@ -32,18 +31,35 @@ function createGroupForm() { // Add selection of collections in library
         placeholder: "About this group"
     })
 
+    const selectColl = document.createElement("select");
+    const selectCollLab = document.createElement("label");
+    selectCollLab.setAttribute("for", "selectColl")
+    selectCollLab.innerText = "Choose collection: "
+    Object.assign(selectColl, {
+        name: "selectColl",
+        id: "selectColl",
+    })
+    const collections = defaultLibrary.collectionArray
+    collections.forEach(collection => {
+        const op = document.createElement("option");
+        op.innerText = collection.name;
+        op.setAttribute("index", collection.index)
+        selectColl.append(op);
+    })
+
     const groupSubmitButton = document.createElement("button")
     groupSubmitButton.innerText = "Submit group"
     Object.assign(groupSubmitButton, {
         class: "groupSubmitButton",
         type: "submit"
     })
-    groupSubmitButton.addEventListener("click", (e) => {
-        console.log("new group!")
+    groupSubmitButton.addEventListener("click", () => {
+        newGroupFromForm()
     });
 
     newGroupForm.append(groupTitleLab, groupTitle,
                         subTitleLab, subTitle,
+                        selectCollLab, selectColl,
                         groupSubmitButton)
 
     dialog.append(newGroupForm)
@@ -100,7 +116,7 @@ function createTaskForm(e) {
 
     const priority = document.createElement("select");
     const priorityLab = document.createElement("label");
-    priorityLab.setAttribute("for", "priorityLab")
+    priorityLab.setAttribute("for", "priority")
     priorityLab.innerText = "Priority: "
     Object.assign(priority, {
         name: "priority",

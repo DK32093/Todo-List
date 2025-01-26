@@ -1,10 +1,11 @@
 // Display functions
 
-import { toDoGroup, toDoTask} from "./classes.js"
+import { defaultLibrary, toDoGroup, toDoTask} from "./classes.js"
 import { createTaskForm } from "./forms.js";
 
 function displayCollection(collection) {
     const groupDisplay = document.querySelector(".groupDisplay");
+    groupDisplay.innerHTML = "";
     const groups = collection.groupArray;
     groups.forEach(group => {
         groupDisplay.append(createGroupCard(group))
@@ -113,9 +114,15 @@ function newTaskFromForm(e) {
 
 function newGroupFromForm() {
     const groupTitle = document.querySelector("#groupTitle").value
-    const subTitle = document.querySelector("#subTtitle").value
+    const subTitle = document.querySelector("#subTitle").value
+    const selectColl = document.querySelector("#selectColl")
+    console.log(selectColl)
+    const collectionChoice = selectColl.options[selectColl.selectedIndex]
+    const ind = collectionChoice.getAttribute("index")
+    const collection  = defaultLibrary.collectionArray[ind]
     const group = new toDoGroup(groupTitle, subTitle)
-    // logic to add the group to the chosen collection
+    collection.addGroup(group)
+    displayCollection(collection)
 }
 
-export { newTaskFromForm, displayCollection }
+export { newGroupFromForm, newTaskFromForm, displayCollection }

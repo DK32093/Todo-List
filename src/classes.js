@@ -17,7 +17,7 @@ class collection {
         this.index = collection.index++;
     }
 
-    addgroup(group) {
+    addGroup(group) {
         this.groupArray.push(group)
     }
 }
@@ -80,6 +80,8 @@ class toDoTask {
     }
 }
 
+// Defaults
+
 function createDefaultCollection(name) {
     const collection1 = new collection(name);
     const group = new toDoGroup("General", "My general tasks")
@@ -88,10 +90,13 @@ function createDefaultCollection(name) {
     task.addChecklistItem("My second checklist item");
     task.addNotes("Don't forget!")
     group.addTask(task)
-    collection1.addgroup(group)
+    collection1.addGroup(group)
     const group2 = new toDoGroup("General2", "My general tasks2")
-    collection1.addgroup(group2)
+    collection1.addGroup(group2)
     return collection1
 }
 
-export { collection, toDoGroup, toDoTask, createDefaultCollection }
+const defaultLibrary = new library("Default_Library")
+defaultLibrary.addCollection(createDefaultCollection("My Todo Collection"))
+
+export { library, collection, toDoGroup, toDoTask, defaultLibrary }
