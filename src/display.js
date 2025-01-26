@@ -1,8 +1,9 @@
-import { toDoTask} from "./classes.js"
-
 // Display functions
 
-function displayGroupList(collection) {
+import { toDoGroup, toDoTask} from "./classes.js"
+import { createTaskForm } from "./forms.js";
+
+function displayCollection(collection) {
     const groupDisplay = document.querySelector(".groupDisplay");
     const groups = collection.groupArray;
     groups.forEach(group => {
@@ -15,10 +16,15 @@ function createGroupCard(group) {
     const title = document.createElement("h1");
     const subTitle = document.createElement("h2");
     const tasksList = group.tasksList
+    const button = document.createElement("button");
+    button.innerText = "Add new ask";
+    button.addEventListener("click", (e) => {
+        createTaskForm(e);
+    });
     title.textContent = group.groupTitle
     subTitle.textContent = group.subTitle
     groupCard.setAttribute("class", "groupCard");
-    groupCard.append(title, subTitle, group.createAddButton())
+    groupCard.append(title, subTitle, button)
     tasksList.forEach(task => {
         groupCard.append(createTaskCard(task))
     })
@@ -27,6 +33,7 @@ function createGroupCard(group) {
 
 function createTaskCard(task) {
     const taskCard = document.createElement("div");
+    const taskCheck = document.createElement("input")
     const taskTitle = document.createElement("h3");
     const description = document.createElement("h4");
     const dueDate = document.createElement("h4");
@@ -35,15 +42,27 @@ function createTaskCard(task) {
     const checkDiv = document.createElement("div");
     const checkTitle = document.createElement("h4")
     const checkList = task.checklist
+    Object.assign(taskCheck, {
+        type: "checkbox",
+        name: "taskCheck",
+        id: "taskCheck",
+    })
+    taskCheck.addEventListener("click", () => {
+        if (taskCheck.checked) {
+            taskCard.classList.add("crossed")
+            return
+        }
+        taskCard.classList.remove("crossed");
+    });
     taskTitle.innerText = task.taskTitle;
     description.innerText = task.description;
     dueDate.innerText = "Due: " + task.dueDate
-    priority.innerText = "Priotirty: " + task.priority
+    priority.innerText = "Priority: " + task.priority
     notes.innerText = task.notes
     checkTitle.innerText = "Checklist"
     checkDiv.append(checkTitle)
     checkDiv.setAttribute("class", "checkDiv")
-    taskCard.append(taskTitle, description, dueDate, priority, notes, checkDiv)
+    taskCard.append(taskCheck, taskTitle, description, dueDate, priority, notes, checkDiv)
     taskCard.setAttribute("class", "taskCard")
     if (checkList) {
         checkList.forEach(item => {
@@ -92,4 +111,11 @@ function newTaskFromForm(e) {
     groupCard.append(createTaskCard(task))
 }
 
-export { newTaskFromForm, displayGroupList }
+function newGroupFromForm() {
+    const groupTitle = document.querySelector("#groupTitle").value
+    const subTitle = document.querySelector("#subTtitle").value
+    const group = new toDoGroup(groupTitle, subTitle)
+    // logic to add the group to the chosen collection
+}
+
+export { newTaskFromForm, displayCollection }

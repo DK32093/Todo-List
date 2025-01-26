@@ -1,5 +1,54 @@
-// Forms for creating new collections, groups, tasks, and checklist items
+// Forms for creating new collections, groups, tasks, 
+// and checklist items
+
 import { newTaskFromForm } from "./display.js"
+
+
+
+function createGroupForm() { // Add selection of collections in library
+    const dialog = document.createElement("dialog")
+    const newGroupForm = document.createElement("form")
+    newGroupForm.setAttribute("method", "dialog")
+
+    const groupTitle = document.createElement("input");
+    const groupTitleLab = document.createElement("label");
+    groupTitleLab.setAttribute("for", "groupTitle")
+    groupTitleLab.innerText = "Group title: "
+    Object.assign(groupTitle, {
+        type: "text",
+        id: "groupTitle",
+        name: "groupTitle",
+        placeholder: "My group"
+    })
+
+    const subTitle = document.createElement("input");
+    const subTitleLab = document.createElement("label");
+    subTitleLab.setAttribute("for", "subTitle")
+    subTitleLab.innerText = "Group notes: "
+    Object.assign(subTitle, {
+        type: "text",
+        id: "subTitle",
+        name: "subTitle",
+        placeholder: "About this group"
+    })
+
+    const groupSubmitButton = document.createElement("button")
+    groupSubmitButton.innerText = "Submit group"
+    Object.assign(groupSubmitButton, {
+        class: "groupSubmitButton",
+        type: "submit"
+    })
+    groupSubmitButton.addEventListener("click", (e) => {
+        console.log("new group!")
+    });
+
+    newGroupForm.append(groupTitleLab, groupTitle,
+                        subTitleLab, subTitle,
+                        groupSubmitButton)
+
+    dialog.append(newGroupForm)
+    return dialog
+}
 
 function createCheckInput() {
     const newCheckInput = document.createElement("input");
@@ -36,7 +85,7 @@ function createTaskForm(e) {
         type: "text",
         id: "description",
         name: "description",
-        placeholder: "A breif description"
+        placeholder: "A brief description"
     })
 
     const dueDate = document.createElement("input");
@@ -109,4 +158,4 @@ function createTaskForm(e) {
     groupCard.append(taskFormDiv)
 }
 
-export { createTaskForm }
+export { createTaskForm, createGroupForm }

@@ -1,9 +1,20 @@
-import {createTaskForm} from "./forms.js";
+class library {
+    constructor(name) {
+        this.name = name;
+        this.collectionArray = []
+    }
+
+    addCollection(collection) {
+        this.collectionArray.push(collection)
+    }
+}
 
 class collection {
+    static index = 0;
     constructor(name) {
         this.name = name;
         this.groupArray = [];
+        this.index = collection.index++;
     }
 
     addgroup(group) {
@@ -19,15 +30,6 @@ class toDoGroup {
       this.groupTitle = groupTitle;
       this.subTitle = subTitle;
       this.tasksList = [];
-    }
-
-    createAddButton() {
-        const button = document.createElement("button");
-        button.innerText = "Add new ask";
-        button.addEventListener("click", (e) => {
-            createTaskForm(e);
-        });
-        return button;
     }
 
     addTask(task) {
@@ -87,6 +89,8 @@ function createDefaultCollection(name) {
     task.addNotes("Don't forget!")
     group.addTask(task)
     collection1.addgroup(group)
+    const group2 = new toDoGroup("General2", "My general tasks2")
+    collection1.addgroup(group2)
     return collection1
 }
 
