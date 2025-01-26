@@ -1,6 +1,5 @@
 import "./styles.css"
-import logMessage from "./logger.js"
-import { createNewCollection, createNewGroup, createNewTask } from "./functions.js"
-import { displayGroupList } from "./ui.js"
+import { createDefaultCollection } from "./classes.js"
+import { displayGroupList } from "./display.js"
 
-displayGroupList(createNewCollection("My Todo Collection"))
+displayGroupList(createDefaultCollection("My Todo Collection"))

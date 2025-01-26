@@ -1,6 +1,6 @@
-import {createTaskForm} from "./ui.js";
+import {createTaskForm} from "./forms.js";
 
-class groupList {
+class collection {
     constructor(name) {
         this.name = name;
         this.groupArray = [];
@@ -78,4 +78,16 @@ class toDoTask {
     }
 }
 
-export { groupList, toDoGroup, toDoTask }
+function createDefaultCollection(name) {
+    const collection1 = new collection(name);
+    const group = new toDoGroup("General", "My general tasks")
+    const task = new toDoTask("Task #1", "My first task", "high")
+    task.addChecklistItem("My first checklist item");
+    task.addChecklistItem("My second checklist item");
+    task.addNotes("Don't forget!")
+    group.addTask(task)
+    collection1.addgroup(group)
+    return collection1
+}
+
+export { collection, toDoGroup, toDoTask, createDefaultCollection }
