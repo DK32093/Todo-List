@@ -1,4 +1,4 @@
-//import { createNewGroup, createNewTask } from "./functions.js"
+import { toDoTask} from "./classes.js"
 
 // Display functions
 
@@ -32,36 +32,64 @@ function createTaskCard(task) {
     const dueDate = document.createElement("h4");
     const priority = document.createElement("h4");
     const notes = document.createElement("h5");
+    const checkDiv = document.createElement("div");
+    const checkTitle = document.createElement("h4")
+    const checkList = task.checklist
     taskTitle.innerText = task.taskTitle;
     description.innerText = task.description;
     dueDate.innerText = "Due: " + task.dueDate
     priority.innerText = "Priotirty: " + task.priority
     notes.innerText = task.notes
-    taskCard.append(taskTitle, description, dueDate, priority, notes)
+    checkTitle.innerText = "Checklist"
+    checkDiv.append(checkTitle)
+    checkDiv.setAttribute("class", "checkDiv")
+    taskCard.append(taskTitle, description, dueDate, priority, notes, checkDiv)
     taskCard.setAttribute("class", "taskCard")
+    if (checkList) {
+        checkList.forEach(item => {
+            checkDiv.append(createCheckItem(item))
+        })
+    }
     return taskCard
 }
 
 function createCheckInput() {
-    const newCheckForm = document.createElement("form");
     const newCheckInput = document.createElement("input");
-    const newCheckInputLab = document.createElement("label");
-    newCheckInputLab.setAttribute("for", "newCheckInput")
-    newCheckInputLab.innerText = "Add to checklist: "
     Object.assign(newCheckInput, {
         type: "text",
-        id: "newCheckInput",
         name: "newCheckInput",
         placeholder: "New checklist item"
     })
-    newCheckForm.append(newCheckInputLab, newCheckInput)
-    return newCheckForm
+    return newCheckInput
+}
+
+function createCheckItem(item) {
+    const pair = document.createElement("div")
+    const box = document.createElement("input")
+    const boxLab = document.createElement("label")
+    boxLab.innerText = item
+    boxLab.setAttribute("for", "box")
+    Object.assign(box, {
+        type: "checkbox",
+        name: "box",
+        id: "box",
+    })
+    box.addEventListener("click", () => {
+        if (box.checked) {
+            boxLab.classList.add("crossed")
+            return
+        }
+        boxLab.classList.remove("crossed");
+    });
+    pair.append(box, boxLab)
+    return pair
 }
 
 function createTaskForm(e) {
     const taskFormDiv = document.createElement("div")
     taskFormDiv.setAttribute("class", "taskFormDiv")
     const newTaskForm = document.createElement("form");
+    newTaskForm.setAttribute("class", "newTaskForm")
     
     const taskTitle = document.createElement("input");
     const taskTitleLab = document.createElement("label");
@@ -91,7 +119,7 @@ function createTaskForm(e) {
     dueDateLab.innerText = "Due date: "
     Object.assign(dueDate, {
         type: "date",
-        id: "dueDate",
+        id: "dueDate", 
         name: "dueDate",
     })
 
@@ -127,19 +155,50 @@ function createTaskForm(e) {
         type: "button"
     })
     newCheckButton.addEventListener("click", (e) => {
-        const closestTaskForm  = e.target.closest(".taskFormDiv")
-        closestTaskForm.append(createCheckInput())
+        const closestTaskForm  = e.target.closest(".newTaskForm")
+        closestTaskForm.insertBefore(createCheckInput(), closestTaskForm.lastElementChild)
+    });
+
+    const taskSubmitButton = document.createElement("button")
+    taskSubmitButton.innerText = "Submit task"
+    Object.assign(taskSubmitButton, {
+        class: "taskSubmitButton",
+        type: "submit"
+    })
+    taskSubmitButton.addEventListener("click", (e) => {
+        e.preventDefault(); //prevent page from refreshing
+        newTaskFromForm(e)
+        taskFormDiv.remove()
     });
 
     newTaskForm.append(taskTitleLab, taskTitle, 
                        descriptionLab, description,
                        dueDateLab, dueDate,
                        priorityLab, priority,
-                       notesLab, notes, newCheckButton)
+                       notesLab, notes, 
+                       newCheckButton, taskSubmitButton)
 
     taskFormDiv.append(newTaskForm)
-    const group = e.target.closest(".groupCard")
-    group.append(taskFormDiv)
+    const groupCard = e.target.closest(".groupCard")
+    groupCard.append(taskFormDiv)
+}
+
+function newTaskFromForm(e) {
+    const taskTitle = document.querySelector("#taskTitle").value
+    const description = document.querySelector("#description").value
+    const dueDate = document.querySelector("#dueDate").value
+    const priority= document.querySelector("#priority").value
+    const notes = document.querySelector("#notes").value
+    const checkList = document.querySelectorAll('input[name="newCheckInput"]')
+    const task = new toDoTask(taskTitle, description, priority)
+    task.setDate(dueDate);
+    task.addNotes(notes);
+    checkList.forEach(input => {
+        task.addChecklistItem(input.value)
+    })
+    const groupCard = e.target.closest(".groupCard")
+    groupCard.append(createTaskCard(task))
+    console.log("run")
 }
 
 export { createTaskForm, displayGroupList }

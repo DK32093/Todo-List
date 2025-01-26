@@ -17,6 +17,7 @@ function createNewCollection(name) {
     const group = createNewGroup("General", "My general tasks")
     const task = createNewTask("Task #1", "My first task", "high")
     task.addChecklistItem("My first checklist item");
+    task.addChecklistItem("My second checklist item");
     task.addNotes("Don't forget!")
     group.addTask(task)
     collection.addgroup(group)
