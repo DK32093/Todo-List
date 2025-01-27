@@ -3,10 +3,8 @@ import { defaultLibrary } from "./classes.js"
 import { createGroupForm, createCollectionForm } from "./forms.js";
 import { displayCollection } from "./display.js"
 
-
-
-createCollectionForm()
-createGroupForm()
+createCollectionForm();
+createGroupForm();
 
 const newCollectionButton = document.getElementById("newCollectionButton")
 const newGroupButton = document.getElementById("newGroupButton")

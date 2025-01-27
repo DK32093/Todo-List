@@ -1,3 +1,5 @@
+import { createCollectionMenuItem } from "./display.js"
+
 class library {
     constructor(name) {
         this.name = name;
@@ -84,6 +86,8 @@ class toDoTask {
 
 function createDefaultCollection(name) {
     const collection1 = new collection(name);
+    const collectionMenu = document.querySelector("#collectionMenu");
+    collectionMenu.append(createCollectionMenuItem(collection1))
     const group = new toDoGroup("General", "My general tasks")
     const task = new toDoTask("Task #1", "My first task", "high")
     task.addChecklistItem("My first checklist item");

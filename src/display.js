@@ -122,8 +122,9 @@ function newTaskFromForm(groupInd, collectionInd) {
     checkList.forEach(input => {
         task.addChecklistItem(input.value)
     })
-    const collection = defaultLibrary.collectionArray[collectionInd]
-    const group = collection.groupArray[groupInd]
+    const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
+    console.log(collection.groupArray)
+    const group = collection.groupArray.find(group => group.index === groupInd)
     group.addTask(task);
     console.log(collection)
     displayCollection(collection)
@@ -136,8 +137,8 @@ function newGroupFromForm() {
     const subTitle = document.querySelector("#subTitle").value
     const selectColl = document.querySelector("#selectColl")
     const collectionChoice = selectColl.options[selectColl.selectedIndex]
-    const ind = collectionChoice.getAttribute("index")
-    const collection  = defaultLibrary.collectionArray[ind]
+    const ind = parseInt(collectionChoice.getAttribute("index"))
+    const collection  = defaultLibrary.collectionArray.find(collection => collection.index === ind);
     const group = new toDoGroup(groupTitle, subTitle)
     collection.addGroup(group)
     displayCollection(collection)
@@ -147,14 +148,22 @@ function newGroupFromForm() {
 function newCollectionFromForm() {
     const collectionInput = document.querySelector("#collectionName")
     const collectionName = collectionInput.value
-    console.log(collectionName)
     const newCollection = new collection(collectionName);
     const collectionMenu = document.querySelector("#collectionMenu");
-    const menuItem = document.createElement("div")
-    menuItem.innerText = collectionName;
-    collectionMenu.append(menuItem)
+    collectionMenu.append(createCollectionMenuItem(newCollection))
     defaultLibrary.addCollection(newCollection)
+    displayCollection(newCollection)
     console.log(defaultLibrary)
 }
 
-export { newCollectionFromForm, newGroupFromForm, newTaskFromForm, displayCollection }
+function createCollectionMenuItem(collection) {
+    const newItem = document.createElement("div");
+    newItem.setAttribute("class", "collectionMenuItem")
+    newItem.innerHTML = collection.name
+    newItem.addEventListener("click", () => {
+        displayCollection(collection)
+    })
+    return newItem
+}
+
+export { newCollectionFromForm, newGroupFromForm, newTaskFromForm, displayCollection, createCollectionMenuItem }
