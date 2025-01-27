@@ -18,33 +18,32 @@ class collection {
     }
 
     addGroup(group) {
-        this.groupArray.push(group)
+        this.groupArray.push(group);
+        group.collectionID = this.index;
     }
 }
 
 class toDoGroup {
-    groupTitle;
-    subTitle;
-    tasksList;
+    static index = 0;
     constructor(groupTitle, subTitle) {
       this.groupTitle = groupTitle;
       this.subTitle = subTitle;
       this.tasksList = [];
+      this.index = toDoGroup.index++;
     }
 
     addTask(task) {
         this.tasksList.push(task)
+        task.groupID = this.index
+    }
+
+    deleteTask(task) {
+        this.tasksList.splice(task.index, 1)
     }
   }
 
 class toDoTask {
-    taskTitle;
-    description;
-    dueDate;
-    priority;
-    notes;
-    checklist;
-    status;
+    static index = 0;
     constructor(taskTitle, desctiption, priority) {
         this.taskTitle = taskTitle;
         this.description = desctiption;
@@ -53,6 +52,7 @@ class toDoTask {
         this.notes = "";
         this.checklist = [];
         this.status = "N"
+        this.index = toDoTask.index++;
     }
 
     setDate(date) {

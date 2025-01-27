@@ -43,6 +43,7 @@ function createTaskCard(task) {
     const checkDiv = document.createElement("div");
     const checkTitle = document.createElement("h4")
     const checkList = task.checklist
+    const deleteButton = document.createElement("button")
     Object.assign(taskCheck, {
         type: "checkbox",
         name: "taskCheck",
@@ -70,6 +71,10 @@ function createTaskCard(task) {
             checkDiv.append(createCheckItem(item))
         })
     }
+    deleteButton.setAttribute("class", "deleteButton");
+    deleteButton.addEventListener("click", (e) => {
+
+    })
     return taskCard
 }
 
@@ -108,6 +113,8 @@ function newTaskFromForm(e) {
     checkList.forEach(input => {
         task.addChecklistItem(input.value)
     })
+    //search collection for group index
+    //add task to group tasklist
     const groupCard = e.target.closest(".groupCard")
     groupCard.append(createTaskCard(task))
 }
@@ -116,7 +123,6 @@ function newGroupFromForm() {
     const groupTitle = document.querySelector("#groupTitle").value
     const subTitle = document.querySelector("#subTitle").value
     const selectColl = document.querySelector("#selectColl")
-    console.log(selectColl)
     const collectionChoice = selectColl.options[selectColl.selectedIndex]
     const ind = collectionChoice.getAttribute("index")
     const collection  = defaultLibrary.collectionArray[ind]
