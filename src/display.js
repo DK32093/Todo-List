@@ -1,31 +1,40 @@
 // Display functions
 
-import { defaultLibrary, toDoGroup, toDoTask} from "./classes.js"
+import { collection, defaultLibrary, toDoGroup, toDoTask} from "./classes.js"
 import { createTaskForm } from "./forms.js";
 
 function displayCollection(collection) {
     const groupDisplay = document.querySelector(".groupDisplay");
     groupDisplay.innerHTML = "";
+    const collectionInd = collection.index
     const groups = collection.groupArray;
     groups.forEach(group => {
-        groupDisplay.append(createGroupCard(group))
+        groupDisplay.append(createGroupCard(group, collectionInd))
     });
 }
 
-function createGroupCard(group) {
+function createGroupCard(group, collectionInd) {
+    //const collectionInd = collection.index;
+    const groupInd = group.index;
     const groupCard = document.createElement('div');
     const title = document.createElement("h1");
     const subTitle = document.createElement("h2");
     const tasksList = group.tasksList
-    const button = document.createElement("button");
-    button.innerText = "Add new ask";
-    button.addEventListener("click", (e) => {
-        createTaskForm(e);
+    const addTaskButton = document.createElement("button");
+    addTaskButton.innerText = "Add new ask";
+    addTaskButton.addEventListener("click", (e) => {
+        const formCheck = document.querySelector(".taskFormDiv");
+        if (formCheck) {
+            formCheck.scrollIntoView();
+            alert("Please submit the current task before creating a new one");
+            return
+        }
+        createTaskForm(e, groupInd, collectionInd);
     });
     title.textContent = group.groupTitle
     subTitle.textContent = group.subTitle
     groupCard.setAttribute("class", "groupCard");
-    groupCard.append(title, subTitle, button)
+    groupCard.append(title, subTitle, addTaskButton)
     tasksList.forEach(task => {
         groupCard.append(createTaskCard(task))
     })
@@ -100,7 +109,7 @@ function createCheckItem(item) {
     return pair
 }
 
-function newTaskFromForm(e) {
+function newTaskFromForm(groupInd, collectionInd) {
     const taskTitle = document.querySelector("#taskTitle").value
     const description = document.querySelector("#description").value
     const dueDate = document.querySelector("#dueDate").value
@@ -113,10 +122,13 @@ function newTaskFromForm(e) {
     checkList.forEach(input => {
         task.addChecklistItem(input.value)
     })
-    //search collection for group index
-    //add task to group tasklist
-    const groupCard = e.target.closest(".groupCard")
-    groupCard.append(createTaskCard(task))
+    const collection = defaultLibrary.collectionArray[collectionInd]
+    const group = collection.groupArray[groupInd]
+    group.addTask(task);
+    console.log(collection)
+    displayCollection(collection)
+    //const groupCard = e.target.closest(".groupCard")
+    //groupCard.append(createTaskCard(task))
 }
 
 function newGroupFromForm() {
@@ -129,6 +141,20 @@ function newGroupFromForm() {
     const group = new toDoGroup(groupTitle, subTitle)
     collection.addGroup(group)
     displayCollection(collection)
+    console.log(collection)
 }
 
-export { newGroupFromForm, newTaskFromForm, displayCollection }
+function newCollectionFromForm() {
+    const collectionInput = document.querySelector("#collectionName")
+    const collectionName = collectionInput.value
+    console.log(collectionName)
+    const newCollection = new collection(collectionName);
+    const collectionMenu = document.querySelector("#collectionMenu");
+    const menuItem = document.createElement("div")
+    menuItem.innerText = collectionName;
+    collectionMenu.append(menuItem)
+    defaultLibrary.addCollection(newCollection)
+    console.log(defaultLibrary)
+}
+
+export { newCollectionFromForm, newGroupFromForm, newTaskFromForm, displayCollection }

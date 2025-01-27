@@ -2,12 +2,53 @@
 // and checklist items
 
 import { defaultLibrary } from "./classes.js"
-import { newGroupFromForm, newTaskFromForm } from "./display.js"
+import { newCollectionFromForm, newGroupFromForm, newTaskFromForm } from "./display.js"
 
-function createGroupForm() { // Add selection of collections in library
+function createCollectionForm() {
     const dialog = document.createElement("dialog")
+    dialog.setAttribute("id", "collectionDialog")
+    const newCollectionForm = document.createElement("form")
+    newCollectionForm.setAttribute("method", "dialog")
+    const display = document.getElementById("displayArea")
+
+    const collectionName = document.createElement("input");
+    const collectionNameLab = document.createElement("label");
+    collectionNameLab.setAttribute("for", "collectionName")
+    collectionNameLab.innerText = "Collection title: "
+    Object.assign(collectionName, {
+        type: "text",
+        id: "collectionName",
+        name: "collectionName",
+        placeholder: "My collection"
+    })
+
+    const collectionSubmitButton = document.createElement("button")
+    collectionSubmitButton.innerText = "Submit collection"
+    Object.assign(collectionSubmitButton, {
+        type: "submit"
+    })
+    collectionSubmitButton.addEventListener("click", (e) => {
+        newCollectionFromForm();
+        createGroupForm(); // reset group form to update collections list
+    });
+
+    newCollectionForm.append(collectionNameLab, collectionName,
+                             collectionSubmitButton)
+
+    dialog.append(newCollectionForm)
+    display.append(dialog)
+}
+
+function createGroupForm() { 
+    const dialogCheck = document.querySelector("#groupDialog")
+    if (dialogCheck) {
+        dialogCheck.remove()
+    }
+    const dialog = document.createElement("dialog")
+    dialog.setAttribute("id", "groupDialog")
     const newGroupForm = document.createElement("form")
     newGroupForm.setAttribute("method", "dialog")
+    const display = document.getElementById("displayArea")
 
     const groupTitle = document.createElement("input");
     const groupTitleLab = document.createElement("label");
@@ -54,7 +95,8 @@ function createGroupForm() { // Add selection of collections in library
         type: "submit"
     })
     groupSubmitButton.addEventListener("click", () => {
-        newGroupFromForm()
+        newGroupFromForm();
+        createGroupForm(); // reset form
     });
 
     newGroupForm.append(groupTitleLab, groupTitle,
@@ -63,7 +105,7 @@ function createGroupForm() { // Add selection of collections in library
                         groupSubmitButton)
 
     dialog.append(newGroupForm)
-    return dialog
+    display.append(dialog)
 }
 
 function createCheckInput() {
@@ -76,7 +118,7 @@ function createCheckInput() {
     return newCheckInput
 }
 
-function createTaskForm(e) {
+function createTaskForm(e, groupInd, collectionInd) {
     const taskFormDiv = document.createElement("div")
     taskFormDiv.setAttribute("class", "taskFormDiv")
     const newTaskForm = document.createElement("form");
@@ -158,7 +200,7 @@ function createTaskForm(e) {
     })
     taskSubmitButton.addEventListener("click", (e) => {
         e.preventDefault(); //prevent page from refreshing
-        newTaskFromForm(e)
+        newTaskFromForm(groupInd, collectionInd)
         taskFormDiv.remove()
     });
 
@@ -170,8 +212,9 @@ function createTaskForm(e) {
                        newCheckButton, taskSubmitButton)
 
     taskFormDiv.append(newTaskForm)
+
     const groupCard = e.target.closest(".groupCard")
     groupCard.append(taskFormDiv)
 }
 
-export { createTaskForm, createGroupForm }
+export { createTaskForm, createGroupForm, createCollectionForm }

@@ -1,15 +1,21 @@
 import "./styles.css"
 import { defaultLibrary } from "./classes.js"
-import { createGroupForm } from "./forms.js";
+import { createGroupForm, createCollectionForm } from "./forms.js";
 import { displayCollection } from "./display.js"
 
 
 
-const display = document.getElementById("displayArea")
+createCollectionForm()
+createGroupForm()
+
+const newCollectionButton = document.getElementById("newCollectionButton")
 const newGroupButton = document.getElementById("newGroupButton")
-const newGroupForm = createGroupForm()
-display.append(newGroupForm)
+newCollectionButton.addEventListener("click", () => {
+    const newCollectionForm = document.getElementById("collectionDialog")
+    newCollectionForm.showModal()
+})
 newGroupButton.addEventListener("click", () => {
+    const newGroupForm = document.getElementById("groupDialog")
     newGroupForm.showModal()
 })
 

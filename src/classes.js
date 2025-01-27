@@ -91,8 +91,6 @@ function createDefaultCollection(name) {
     task.addNotes("Don't forget!")
     group.addTask(task)
     collection1.addGroup(group)
-    const group2 = new toDoGroup("General2", "My general tasks2")
-    collection1.addGroup(group2)
     return collection1
 }
 
