@@ -6,6 +6,8 @@ import { createTaskForm } from "./forms.js";
 function displayCollection(collection) {
     const groupDisplay = document.querySelector(".groupDisplay");
     groupDisplay.innerHTML = "";
+    const collectionTitle = document.querySelector("#collectionTitle");
+    collectionTitle.innerText = collection.name
     const collectionInd = collection.index
     const groups = collection.groupArray;
     groups.forEach(group => {
@@ -14,13 +16,13 @@ function displayCollection(collection) {
 }
 
 function createGroupCard(group, collectionInd) {
-    //const collectionInd = collection.index;
     const groupInd = group.index;
     const groupCard = document.createElement('div');
     const title = document.createElement("h1");
     const subTitle = document.createElement("h2");
     const tasksList = group.tasksList
     const addTaskButton = document.createElement("button");
+    const groupDeleteButton = document.createElement("button")
     addTaskButton.innerText = "Add new ask";
     addTaskButton.addEventListener("click", (e) => {
         const formCheck = document.querySelector(".taskFormDiv");
@@ -34,14 +36,22 @@ function createGroupCard(group, collectionInd) {
     title.textContent = group.groupTitle
     subTitle.textContent = group.subTitle
     groupCard.setAttribute("class", "groupCard");
-    groupCard.append(title, subTitle, addTaskButton)
+    groupCard.append(title, subTitle, addTaskButton, groupDeleteButton)
     tasksList.forEach(task => {
-        groupCard.append(createTaskCard(task))
+        groupCard.append(createTaskCard(task, collectionInd))
+    })
+    groupDeleteButton.setAttribute("class", "groupDeleteButton");
+    groupDeleteButton.innerText = "delete group"
+    groupDeleteButton.addEventListener("click", () => {
+        const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
+        const groupList = collection.groupArray
+        groupList.splice(groupList.findIndex(g => g.index === groupInd), 1)
+        displayCollection(collection)
     })
     return groupCard
 }
 
-function createTaskCard(task) {
+function createTaskCard(task, collectionInd) {
     const taskCard = document.createElement("div");
     const taskCheck = document.createElement("input")
     const taskTitle = document.createElement("h3");
@@ -73,7 +83,7 @@ function createTaskCard(task) {
     checkTitle.innerText = "Checklist"
     checkDiv.append(checkTitle)
     checkDiv.setAttribute("class", "checkDiv")
-    taskCard.append(taskCheck, taskTitle, description, dueDate, priority, notes, checkDiv)
+    taskCard.append(taskCheck, taskTitle, description, dueDate, priority, notes, checkDiv, deleteButton)
     taskCard.setAttribute("class", "taskCard")
     if (checkList) {
         checkList.forEach(item => {
@@ -81,8 +91,13 @@ function createTaskCard(task) {
         })
     }
     deleteButton.setAttribute("class", "deleteButton");
-    deleteButton.addEventListener("click", (e) => {
-
+    deleteButton.innerText = "delete task"
+    deleteButton.addEventListener("click", () => {
+        const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
+        const group = collection.groupArray.find(group => group.index === task.groupID)
+        const tasksList = group.tasksList
+        tasksList.splice(tasksList.findIndex(t => t.index === task.index), 1)
+        displayCollection(collection)
     })
     return taskCard
 }
@@ -123,13 +138,9 @@ function newTaskFromForm(groupInd, collectionInd) {
         task.addChecklistItem(input.value)
     })
     const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
-    console.log(collection.groupArray)
     const group = collection.groupArray.find(group => group.index === groupInd)
     group.addTask(task);
-    console.log(collection)
     displayCollection(collection)
-    //const groupCard = e.target.closest(".groupCard")
-    //groupCard.append(createTaskCard(task))
 }
 
 function newGroupFromForm() {
@@ -153,7 +164,6 @@ function newCollectionFromForm() {
     collectionMenu.append(createCollectionMenuItem(newCollection))
     defaultLibrary.addCollection(newCollection)
     displayCollection(newCollection)
-    console.log(defaultLibrary)
 }
 
 function createCollectionMenuItem(collection) {
