@@ -2,14 +2,35 @@
 
 import { collection, defaultLibrary, toDoGroup, toDoTask} from "./classes.js"
 import { createTaskForm } from "./forms.js";
+import collectionSVG from "./assets/Collection.svg"
 
 function displayCollection(collection) {
     const groupDisplay = document.querySelector(".groupDisplay");
-    groupDisplay.innerHTML = "";
-    const collectionTitle = document.querySelector("#collectionTitle");
-    collectionTitle.innerText = collection.name
+    const collectionHeader = document.querySelector("#collectionHeader")
+    const collectionTitle = document.createElement("h1");
+    const deleteCollectionButton = document.createElement("button")
+    const collectionArray = defaultLibrary.collectionArray
     const collectionInd = collection.index
     const groups = collection.groupArray;
+    collectionTitle.innerText = collection.name
+    deleteCollectionButton.addEventListener("click", () => {
+        if (confirm("Are you sure you want to delete this collection?")) {
+            collectionArray.splice(collectionArray.findIndex(c => c.index === collectionInd), 1) // remove from array
+            collection = null // allow garbage collection
+            createCollectionMenu(collectionArray); // remove from menu
+            if (collectionArray.length > 0) {
+                    displayCollection(collectionArray[0])
+                    return
+            }
+            groupDisplay.innerHTML = "";
+            deleteCollectionButton.remove();
+            collectionTitle.innerText = "Create a new collection to get started!"
+            }
+    })
+    deleteCollectionButton.innerText = "Delete Collection"
+    collectionHeader.innerHTML = "";
+    collectionHeader.append(collectionTitle, deleteCollectionButton);
+    groupDisplay.innerHTML = "";
     groups.forEach(group => {
         groupDisplay.append(createGroupCard(group, collectionInd))
     });
@@ -46,6 +67,7 @@ function createGroupCard(group, collectionInd) {
         const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
         const groupList = collection.groupArray
         groupList.splice(groupList.findIndex(g => g.index === groupInd), 1)
+        group = null;
         displayCollection(collection)
     })
     return groupCard
@@ -96,7 +118,8 @@ function createTaskCard(task, collectionInd) {
         const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
         const group = collection.groupArray.find(group => group.index === task.groupID)
         const tasksList = group.tasksList
-        tasksList.splice(tasksList.findIndex(t => t.index === task.index), 1)
+        tasksList.splice(tasksList.findIndex(t => t.index === task.index), 1);
+        task = null;
         displayCollection(collection)
     })
     return taskCard
@@ -153,27 +176,45 @@ function newGroupFromForm() {
     const group = new toDoGroup(groupTitle, subTitle)
     collection.addGroup(group)
     displayCollection(collection)
-    console.log(collection)
 }
 
 function newCollectionFromForm() {
     const collectionInput = document.querySelector("#collectionName")
     const collectionName = collectionInput.value
     const newCollection = new collection(collectionName);
-    const collectionMenu = document.querySelector("#collectionMenu");
-    collectionMenu.append(createCollectionMenuItem(newCollection))
-    defaultLibrary.addCollection(newCollection)
+    defaultLibrary.addCollection(newCollection);
+    createCollectionMenu(defaultLibrary.collectionArray)
     displayCollection(newCollection)
 }
 
-function createCollectionMenuItem(collection) {
-    const newItem = document.createElement("div");
-    newItem.setAttribute("class", "collectionMenuItem")
-    newItem.innerHTML = collection.name
-    newItem.addEventListener("click", () => {
-        displayCollection(collection)
+function createCollectionMenu(collectionArray) {
+    const collectionMenu = document.querySelector("#collectionMenu");
+    collectionMenu.innerHTML = "";
+    collectionArray.forEach(c => {
+        const newItem = document.createElement("div");
+        const title = document.createElement("div")
+        const svg = document.createElement("img");
+        newItem.setAttribute("class", "collectionMenuItem");
+        title.innerHTML = c.name;
+        svg.setAttribute("src", collectionSVG)
+        newItem.append(svg, title)
+        collectionMenu.append(newItem);
+        newItem.addEventListener("click", () => {
+            displayCollection(c)
+        })
     })
-    return newItem
 }
 
-export { newCollectionFromForm, newGroupFromForm, newTaskFromForm, displayCollection, createCollectionMenuItem }
+// function removeCollectionMenuItem(collectionInd) {
+//     const collectionMenu = document.querySelector("#collectionMenu");
+//     const collectionList = collectionMenu.children;
+//     console.log(collectionList)
+//     Array.from(collectionList).forEach(collection => {
+//         console.log(collection)
+//         if (collection.collectionind === collectionInd) {
+//             collectionMenu.remove(collection)
+//         }
+//     })
+// }
+
+export { newCollectionFromForm, newGroupFromForm, newTaskFromForm, displayCollection, createCollectionMenu }

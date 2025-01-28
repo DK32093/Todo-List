@@ -1,4 +1,4 @@
-import { createCollectionMenuItem } from "./display.js"
+import { createCollectionMenu } from "./display.js"
 
 class library {
     constructor(name) {
@@ -23,6 +23,7 @@ class collection {
         this.groupArray.push(group);
         group.collectionID = this.index;
     }
+
 }
 
 class toDoGroup {
@@ -86,8 +87,6 @@ class toDoTask {
 
 function createDefaultCollection(name) {
     const collection1 = new collection(name);
-    const collectionMenu = document.querySelector("#collectionMenu");
-    collectionMenu.append(createCollectionMenuItem(collection1))
     const group = new toDoGroup("General", "My general tasks")
     const task = new toDoTask("Task #1", "My first task", "high")
     task.addChecklistItem("My first checklist item");
@@ -100,5 +99,6 @@ function createDefaultCollection(name) {
 
 const defaultLibrary = new library("Default_Library")
 defaultLibrary.addCollection(createDefaultCollection("My Todo Collection"))
+createCollectionMenu(defaultLibrary.collectionArray)
 
 export { library, collection, toDoGroup, toDoTask, defaultLibrary }

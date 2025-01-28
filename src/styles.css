@@ -2,13 +2,27 @@ body {
     background-color: rgb(56, 56, 156);
 }
 
+button {
+    cursor: pointer;
+}
+
+#collectionMenuTitle {
+    font-size: 2rem;
+}
+
 #collectionMenu {
     border: solid 2px rgb(57, 196, 168);
     margin-bottom: 1rem;
 }
 
+.collectionMenuItem {
+    display: flex;
+    align-items: center;
+}
+
 .collectionMenuItem:hover {
     background-color: rgba(75, 75, 75, 0.5);
+    cursor: pointer;
 }
 
 .groupCard {
