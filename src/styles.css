@@ -2,7 +2,7 @@ body {
     background-color: rgb(56, 56, 156);
 }
 
-button {
+button, .deleteButton, .editButton, .expandButton {
     cursor: pointer;
 }
 
@@ -30,15 +30,46 @@ button {
     border: solid 2px black;
 }
 
+/*Tasks*/
+
 .taskCard {
-    display: flex;
-    gap: 1rem;
     border: solid 2px rgb(215, 11, 11);
+    overflow: hidden;
+}
+
+.basicView {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0.5rem;
+}
+
+.basicView > * {
+    margin: 0.5rem;
+}
+
+.taskButtonDiv {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.taskDetails {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin: 0.5rem;
+    -display: none;
+}
+
+.notesDiv, .checkDiv, .basicView {
+    background-color: rgb(73, 88, 101);
+    border-radius: 1rem;
+    padding: 0.5rem;
 }
 
 .crossed{
     text-decoration: line-through;
-    }
+}
 
 form {
     display: flex;

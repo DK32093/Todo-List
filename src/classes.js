@@ -47,10 +47,9 @@ class toDoGroup {
 
 class toDoTask {
     static index = 0;
-    constructor(taskTitle, desctiption, priority) {
+    constructor(taskTitle, priority) {
         this.taskTitle = taskTitle;
-        this.description = desctiption;
-        this.dueDate = "";
+        this.dueDate = "None";
         this.priority = priority;
         this.notes = "";
         this.checklist = [];
@@ -88,7 +87,7 @@ class toDoTask {
 function createDefaultCollection(name) {
     const collection1 = new collection(name);
     const group = new toDoGroup("General", "My general tasks")
-    const task = new toDoTask("Task #1", "My first task", "high")
+    const task = new toDoTask("Task #1", "high")
     task.addChecklistItem("My first checklist item");
     task.addChecklistItem("My second checklist item");
     task.addNotes("Don't forget!")

@@ -108,16 +108,6 @@ function createGroupForm() {
     display.append(dialog)
 }
 
-function createCheckInput() {
-    const newCheckInput = document.createElement("input");
-    Object.assign(newCheckInput, {
-        type: "text",
-        name: "newCheckInput",
-        placeholder: "New checklist item"
-    })
-    return newCheckInput
-}
-
 function createTaskForm(e, groupInd, collectionInd) {
     const taskFormDiv = document.createElement("div")
     taskFormDiv.setAttribute("class", "taskFormDiv")
@@ -133,17 +123,6 @@ function createTaskForm(e, groupInd, collectionInd) {
         id: "taskTitle",
         name: "taskTitle",
         placeholder: "My task"
-    })
-    
-    const description = document.createElement("input");
-    const descriptionLab = document.createElement("label");
-    descriptionLab.setAttribute("for", "description")
-    descriptionLab.innerText = "Description: "
-    Object.assign(description, {
-        type: "text",
-        id: "description",
-        name: "description",
-        placeholder: "A brief description"
     })
 
     const dueDate = document.createElement("input");
@@ -205,7 +184,6 @@ function createTaskForm(e, groupInd, collectionInd) {
     });
 
     newTaskForm.append(taskTitleLab, taskTitle, 
-                       descriptionLab, description,
                        dueDateLab, dueDate,
                        priorityLab, priority,
                        notesLab, notes, 
@@ -215,6 +193,16 @@ function createTaskForm(e, groupInd, collectionInd) {
 
     const groupCard = e.target.closest(".groupCard")
     groupCard.append(taskFormDiv)
+}
+
+function createCheckInput() {
+    const newCheckInput = document.createElement("input");
+    Object.assign(newCheckInput, {
+        type: "text",
+        name: "newCheckInput",
+        placeholder: "New checklist item"
+    })
+    return newCheckInput
 }
 
 export { createTaskForm, createGroupForm, createCollectionForm }
