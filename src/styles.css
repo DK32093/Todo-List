@@ -57,8 +57,12 @@ button, .deleteButton, .editButton, .expandButton {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.5rem;
-    margin: 0.5rem;
-    -display: none;
+    -margin: 0.5rem;
+    transition: height 0.5s, opacity 0.5s ease-out;
+}
+
+.hidden {
+    display: none;
 }
 
 .notesDiv, .checkDiv, .basicView {

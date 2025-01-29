@@ -162,6 +162,19 @@ function createTaskCard(task, collectionInd) {
     expandButton.setAttribute("src", expandSVG)
     editButton.setAttribute("src", editSVG)
     deleteButton.setAttribute("src", deleteSVG)
+    taskDetails.style.visibility = "hidden"
+    taskDetails.style.height = "0px"
+    expandButton.addEventListener("click", () => {
+        if (taskDetails.style.visibility ==="hidden") {
+            taskDetails.style.visibility = "visible";
+            taskDetails.style.height =  notesDiv.clientHeight + "px";
+            taskDetails.style.margin = "0.5rem"
+            return
+        }
+        taskDetails.style.visibility ="hidden";
+        taskDetails.style.height = "0px"
+        taskDetails.style.margin = "0rem"
+    });
     deleteButton.addEventListener("click", () => {
         const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
         const group = collection.groupArray.find(group => group.index === task.groupID)
