@@ -146,7 +146,11 @@ function createTaskCard(task, collectionInd) {
     // basic view params
     taskTitle.innerText = task.taskTitle;
     dueDate.innerText = "Due:\n" + task.dueDate
-    
+    if (task.priority === "high") {
+        basicView.style.border = "solid 5px red"
+        notesDiv.style.border = "solid 5px red"
+        checkDiv.style.border = "solid 5px red"
+    }
     Object.assign(taskCheck, {
         type: "checkbox",
         name: "taskCheck",
