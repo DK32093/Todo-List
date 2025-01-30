@@ -146,7 +146,7 @@ function createTaskCard(task, collectionInd) {
     // basic view params
     taskTitle.innerText = task.taskTitle;
     dueDate.innerText = "Due:\n" + task.dueDate
-    priority.innerText = "Priority: " + task.priority
+    
     Object.assign(taskCheck, {
         type: "checkbox",
         name: "taskCheck",
@@ -184,12 +184,15 @@ function createTaskCard(task, collectionInd) {
         displayCollection(collection)
     })
     // detailed view params
+    priority.innerText = "Priority: " + task.priority
     notesTitle.innerText = "Notes"
     notes.innerText = task.notes
     checkTitle.innerText = "Checklist"
     // Classes
     taskCard.setAttribute("class", "taskCard")
     basicView.setAttribute("class", "basicView")
+    taskTitle.setAttribute("class", "taskTitle")
+    dueDate.setAttribute("class", "dueDate")
     taskButtonsDiv.setAttribute("class", "taskButtonDiv")
     deleteButton.setAttribute("class", "deleteButton");
     taskDetails.setAttribute("class", "taskDetails")
@@ -197,8 +200,8 @@ function createTaskCard(task, collectionInd) {
     checkDiv.setAttribute("class", "checkDiv")
     // Append elements
     taskButtonsDiv.append(expandButton, editButton, deleteButton)
-    basicView.append(taskCheck, taskTitle, dueDate, priority, taskButtonsDiv)
-    notesDiv.append(notesTitle, notes)
+    basicView.append(taskCheck, taskTitle, dueDate, taskButtonsDiv)
+    notesDiv.append(priority, notesTitle, notes)
     checkDiv.append(checkTitle)
     if (checkList) {
         checkList.forEach(item => {
