@@ -142,6 +142,7 @@ function createTaskCard(task, collectionInd) {
     const notes = document.createElement("h5");
     const checkDiv = document.createElement("div");
     const checkTitle = document.createElement("h4")
+    const addCheck = document.createElement("button")
     const checkList = task.checklist
     // basic view params
     taskTitle.innerText = task.taskTitle;
@@ -174,8 +175,7 @@ function createTaskCard(task, collectionInd) {
     expandButton.setAttribute("src", expandSVG)
     editButton.setAttribute("src", editSVG)
     deleteButton.setAttribute("src", deleteSVG)
-    taskDetails.style.visibility = "hidden"
-    taskDetails.style.height = "0px"
+    
     expandButton.addEventListener("click", () => {
         if (taskDetails.style.visibility === "hidden") {
             taskDetails.style.visibility = "visible";
@@ -189,6 +189,15 @@ function createTaskCard(task, collectionInd) {
     });
     //edit
     editButton.addEventListener("click", () => {
+        const formCheck = document.getElementsByClassName("submitEdits");
+        console.log(formCheck)
+        if (formCheck.length > 0) {
+            formCheck[0].scrollIntoView();
+            alert("Please finish editing the current task");
+            return
+        }
+        editButton.style.pointerEvents = 'none';
+        editButton.style.opacity = '0.5';
         const editable = [];
         editable.push(taskTitle, notes)
         const checks = checkDiv.querySelectorAll("*") // get all descendents
@@ -243,6 +252,7 @@ function createTaskCard(task, collectionInd) {
         priority.append(priorityLab, editPriority)
 
         const submitEdits = document.createElement("button")
+        submitEdits.classList.add("submitEdits")
         submitEdits.innerText = "Finished Editing Task"
         submitEdits.addEventListener("click", () => {
            const editedTitle = taskCard.getElementsByClassName("taskTitle")[0].innerText
@@ -253,6 +263,7 @@ function createTaskCard(task, collectionInd) {
            const editedTask = new toDoTask(editedTitle, editedPriority)
            editedTask.groupID = task.groupID;
            editedTask.setDate(editedDueDate);
+           if (editedTask.dueDate.length < 1) {editedTask.dueDate = "None"}
            editedTask.addNotes(editedNotes);
            editedChecklist.forEach(input => {
               editedTask.addChecklistItem(input.innerText)
@@ -271,7 +282,6 @@ function createTaskCard(task, collectionInd) {
         taskDetails.style.visibility = "visible";
         taskDetails.style.height =  "auto"
         taskDetails.style.margin = "0.5rem";
-        
     })
 
     deleteButton.addEventListener("click", () => {
@@ -283,6 +293,8 @@ function createTaskCard(task, collectionInd) {
         displayCollection(collection)
     })
     // detailed view params
+    taskDetails.style.visibility = "hidden"
+    taskDetails.style.height = "0px"
     priority.innerText = "Priority: " + task.priority
     notesTitle.innerText = "Notes"
     notes.innerText = task.notes
