@@ -80,12 +80,7 @@ function createGroupCard(group, collectionInd) {
     const groupDeleteButton = document.createElement("button")
     addTaskButton.innerText = "Add New Task";
     addTaskButton.addEventListener("click", (e) => {
-        const formCheck = document.querySelector(".taskFormDiv");
-        if (formCheck) {
-            formCheck.scrollIntoView();
-            alert("Please submit the current task before creating a new one");
-            return
-        }
+        if (checkForActiveForms()) {return};
         createTaskForm(e, groupInd, collectionInd);
     });
     title.textContent = group.groupTitle
@@ -189,22 +184,14 @@ function createTaskCard(task, collectionInd) {
     });
     //edit
     editButton.addEventListener("click", () => {
-        const formCheck = document.getElementsByClassName("submitEdits");
-        console.log(formCheck)
-        if (formCheck.length > 0) {
-            formCheck[0].scrollIntoView();
-            alert("Please finish editing the current task");
-            return
-        }
+        if (checkForActiveForms()) {return};
         editButton.style.pointerEvents = 'none';
         editButton.style.opacity = '0.5';
         const editable = [];
         editable.push(taskTitle, notes)
-        const checks = checkDiv.querySelectorAll("*") // get all descendents
-        checks.forEach(desc => {
-            if (desc.tagName === "LABEL") {
-                editable.push(desc)
-            }
+        const checks = Array.from(checkDiv.getElementsByTagName("label")) // get all descendents
+        checks.forEach(item => {
+            editable.push(item)
         })
         editable.forEach(item => {
             item.contentEditable = true;
@@ -368,4 +355,21 @@ function newTaskFromForm(groupInd, collectionInd) {
     displayCollection(collection)
 }
 
-export { newCollectionFromForm, newGroupFromForm, newTaskFromForm, displayCollection, createCollectionMenu }
+// Check
+
+function checkForActiveForms() {
+    const editCheck = document.getElementsByClassName("submitEdits");
+    const formCheck = document.querySelector(".taskFormDiv");
+    if (formCheck || editCheck.length > 0) {
+        alert("Please finish editing the current task");
+        return true
+    }
+    return false
+}
+
+export { newCollectionFromForm, 
+         newGroupFromForm, 
+         newTaskFromForm, 
+         displayCollection, 
+         createCollectionMenu, 
+         checkForActiveForms }

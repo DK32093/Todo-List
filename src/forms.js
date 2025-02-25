@@ -187,12 +187,13 @@ function createTaskForm(e, groupInd, collectionInd) {
                        dueDateLab, dueDate,
                        priorityLab, priority,
                        notesLab, notes, 
-                       newCheckButton, taskSubmitButton)
+                       newCheckButton, taskSubmitButton);
 
-    taskFormDiv.append(newTaskForm)
+    taskFormDiv.append(newTaskForm);
 
-    const groupCard = e.target.closest(".groupCard")
-    groupCard.append(taskFormDiv)
+    const groupCard = e.target.closest(".groupCard");
+    groupCard.append(taskFormDiv);
+    taskFormDiv.scrollIntoView();
 }
 
 function createCheckInput() {
