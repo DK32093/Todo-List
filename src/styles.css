@@ -1,5 +1,10 @@
+* {
+    word-break: break-all;
+    word-break: break-word;
+}
+
 body {
-    background-color: rgb(56, 56, 156);
+    background-color: rgb(132, 132, 144);
 }
 
 button, .deleteButton, .editButton, .expandButton {
@@ -33,7 +38,7 @@ button, .deleteButton, .editButton, .expandButton {
 /*Tasks*/
 
 .taskCard {
-    border: solid 2px rgb(215, 11, 11);
+    -border: solid 2px rgb(215, 11, 11);
     overflow: hidden;
 }
 
@@ -74,7 +79,7 @@ button, .deleteButton, .editButton, .expandButton {
     padding: 0.5rem;
 }
 
-.crossed{
+.crossed {
     text-decoration: line-through;
 }
 

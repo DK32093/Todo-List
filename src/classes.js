@@ -87,11 +87,15 @@ class toDoTask {
 function createDefaultCollection(name) {
     const collection1 = new collection(name);
     const group = new toDoGroup("General", "My general tasks")
-    const task = new toDoTask("Task #1", "high")
+    const task = new toDoTask("Task #1", "High")
+    const task2 = new toDoTask("Task #2", "Medium")
+    const task3 = new toDoTask("Task #3", "Low")
     task.addChecklistItem("My first checklist item");
     task.addChecklistItem("My second checklist item");
     task.addNotes("Don't forget!")
     group.addTask(task)
+    group.addTask(task2)
+    group.addTask(task3)
     collection1.addGroup(group)
     return collection1
 }

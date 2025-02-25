@@ -78,7 +78,7 @@ function createGroupCard(group, collectionInd) {
     const tasksList = group.tasksList
     const addTaskButton = document.createElement("button");
     const groupDeleteButton = document.createElement("button")
-    addTaskButton.innerText = "Add new ask";
+    addTaskButton.innerText = "Add New Task";
     addTaskButton.addEventListener("click", (e) => {
         const formCheck = document.querySelector(".taskFormDiv");
         if (formCheck) {
@@ -96,7 +96,7 @@ function createGroupCard(group, collectionInd) {
         groupCard.append(createTaskCard(task, collectionInd))
     })
     groupDeleteButton.setAttribute("class", "groupDeleteButton");
-    groupDeleteButton.innerText = "delete group"
+    groupDeleteButton.innerText = "Delete Group"
     groupDeleteButton.addEventListener("click", () => {
         if (confirm("Are you sure you want to delete this group?")) {
             const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
@@ -115,12 +115,12 @@ function newGroupFromForm() {
     const selectColl = document.querySelector("#selectColl")
     const collectionChoice = selectColl.options[selectColl.selectedIndex]
     const ind = parseInt(collectionChoice.getAttribute("index"))
-    const collection  = defaultLibrary.collectionArray.find(collection => collection.index === ind);
+    const collection = defaultLibrary.collectionArray.find(collection => collection.index === ind);
     const group = new toDoGroup(groupTitle, subTitle)
     collection.addGroup(group)
     displayCollection(collection)
 }
-
+ 
 // Tasks
 
 function createTaskCard(task, collectionInd) {
@@ -130,7 +130,6 @@ function createTaskCard(task, collectionInd) {
     const taskCheck = document.createElement("input")
     const taskTitle = document.createElement("h4");
     const dueDate = document.createElement("h5");
-    const priority = document.createElement("h5");
     const taskButtonsDiv = document.createElement("div");
     const expandButton = document.createElement("img");
     const editButton = document.createElement("img");
@@ -138,6 +137,7 @@ function createTaskCard(task, collectionInd) {
     // detailed view elements
     const taskDetails = document.createElement("div")
     const notesDiv = document.createElement("div")
+    const priority = document.createElement("h5");
     const notesTitle = document.createElement("h4")
     const notes = document.createElement("h5");
     const checkDiv = document.createElement("div");
@@ -146,10 +146,18 @@ function createTaskCard(task, collectionInd) {
     // basic view params
     taskTitle.innerText = task.taskTitle;
     dueDate.innerText = "Due:\n" + task.dueDate
-    if (task.priority === "high") {
-        basicView.style.border = "solid 5px red"
-        notesDiv.style.border = "solid 5px red"
-        checkDiv.style.border = "solid 5px red"
+    if (task.priority === "High") {
+        basicView.style.border = "solid 3px red"
+        notesDiv.style.border = "solid 3px red"
+        checkDiv.style.border = "solid 3px red"
+    } else if (task.priority === "Medium") {
+        basicView.style.border = "solid 3px blue"
+        notesDiv.style.border = "solid 3px blue"
+        checkDiv.style.border = "solid 3px blue"
+    } else {
+        basicView.style.border = "solid 3px green"
+        notesDiv.style.border = "solid 3px green"
+        checkDiv.style.border = "solid 3px green"
     }
     Object.assign(taskCheck, {
         type: "checkbox",
@@ -169,16 +177,103 @@ function createTaskCard(task, collectionInd) {
     taskDetails.style.visibility = "hidden"
     taskDetails.style.height = "0px"
     expandButton.addEventListener("click", () => {
-        if (taskDetails.style.visibility ==="hidden") {
+        if (taskDetails.style.visibility === "hidden") {
             taskDetails.style.visibility = "visible";
             taskDetails.style.height =  notesDiv.clientHeight + "px";
-            taskDetails.style.margin = "0.5rem"
+            taskDetails.style.margin = "0.5rem";
             return
         }
         taskDetails.style.visibility ="hidden";
         taskDetails.style.height = "0px"
         taskDetails.style.margin = "0rem"
     });
+    //edit
+    editButton.addEventListener("click", () => {
+        const editable = [];
+        editable.push(taskTitle, notes)
+        const checks = checkDiv.querySelectorAll("*") // get all descendents
+        checks.forEach(desc => {
+            if (desc.tagName === "LABEL") {
+                editable.push(desc)
+            }
+        })
+        editable.forEach(item => {
+            item.contentEditable = true;
+            item.style.borderBottom = "solid white 1px";
+            item.addEventListener("keydown", (e) => {
+                if(e.key === "Enter") {
+                    e.preventDefault();
+                }
+            })
+        })
+
+        const editDueDate = document.createElement("input");
+        const dueDateLab = document.createElement("label");
+        dueDateLab.setAttribute("for", "editDueDate")
+        dueDateLab.innerText = "Due:"
+        Object.assign(editDueDate, {
+            type: "date",
+            id: "editDueDate", 
+            name: "editDueDate",
+            value: task.dueDate
+        })
+        dueDate.innerText = "";
+        dueDate.append(dueDateLab, editDueDate)
+
+        const editPriority = document.createElement("select");
+        const priorityLab = document.createElement("label");
+        priorityLab.setAttribute("for", "editPriority")
+        priorityLab.innerText = "Priority: "
+        Object.assign(editPriority, {
+            name: "editPriority",
+            id: "editPriority"
+        })
+        const low = document.createElement("option");
+        const medium = document.createElement("option");
+        const high = document.createElement("option");
+        low.innerText = "Low"
+        low.value = "Low"
+        medium.innerText = "Medium"
+        medium.value = "Medium"
+        high.innerText = "High"
+        high.value = "High"
+        editPriority.append(low, medium, high)
+        editPriority.value = task.priority
+        priority.innerText = "";
+        priority.append(priorityLab, editPriority)
+
+        const submitEdits = document.createElement("button")
+        submitEdits.innerText = "Finished Editing Task"
+        submitEdits.addEventListener("click", () => {
+           const editedTitle = taskCard.getElementsByClassName("taskTitle")[0].innerText
+           const editedDueDate = taskCard.querySelector("#editDueDate").value
+           const editedPriority= taskCard.querySelector("#editPriority").value
+           const editedNotes = notes.innerText
+           const editedChecklist = Array.from(checkDiv.getElementsByTagName("label"))
+           const editedTask = new toDoTask(editedTitle, editedPriority)
+           editedTask.groupID = task.groupID;
+           editedTask.setDate(editedDueDate);
+           editedTask.addNotes(editedNotes);
+           editedChecklist.forEach(input => {
+              editedTask.addChecklistItem(input.innerText)
+           })
+           // replace task
+           const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
+           const group = collection.groupArray.find(group => group.index === task.groupID)
+           const tasksList = group.tasksList
+           tasksList.splice(tasksList.findIndex(t => t.index === task.index), 1, editedTask);
+           task = null;
+           displayCollection(collection)
+        })
+        notesDiv.append(submitEdits)
+
+        // expand task card
+        taskDetails.style.visibility = "visible";
+        taskDetails.style.height =  "auto"
+        taskDetails.style.margin = "0.5rem";
+        
+    })
+
     deleteButton.addEventListener("click", () => {
         const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
         const group = collection.groupArray.find(group => group.index === task.groupID)
@@ -236,6 +331,9 @@ function createCheckItem(item) {
         }
         boxLab.classList.remove("crossed");
     });
+    boxLab.addEventListener("click", (e) => {
+        e.preventDefault(); // Stops box from being checked when label is clicked
+    })
     pair.append(box, boxLab)
     return pair
 }
