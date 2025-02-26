@@ -206,4 +206,4 @@ function createCheckInput() {
     return newCheckInput
 }
 
-export { createTaskForm, createGroupForm, createCollectionForm }
+export { createTaskForm, createGroupForm, createCollectionForm, createCheckInput }

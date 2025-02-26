@@ -1,7 +1,7 @@
 // Display functions
 
 import { collection, defaultLibrary, toDoGroup, toDoTask} from "./classes.js"
-import { createTaskForm } from "./forms.js";
+import { createTaskForm, createCheckInput } from "./forms.js";
 import collectionSVG from "./assets/Collection.svg"
 import deleteSVG from "./assets/delete.svg"
 import expandSVG from "./assets/expand.svg"
@@ -132,8 +132,10 @@ function createTaskCard(task, collectionInd) {
     const notesTitle = document.createElement("h4")
     const notes = document.createElement("h5");
     const checkDiv = document.createElement("div");
+    const checkTitleDiv = document.createElement("div");
     const checkTitle = document.createElement("h4")
     const addCheck = document.createElement("button")
+    const listDiv = document.createElement("div");
     const checkList = task.checklist
     // basic view params
     taskTitle.innerText = task.taskTitle;
@@ -171,6 +173,37 @@ function createTaskCard(task, collectionInd) {
     notesTitle.innerText = "Notes"
     notes.innerText = task.notes
     checkTitle.innerText = "Checklist"
+    addCheck.innerText = "Add Item"
+    addCheck.addEventListener("click", () => {
+        taskDetails.style.height =  "auto";
+        const subCheck = document.getElementsByClassName("newCheckSubmit")
+        if (subCheck.length < 1) {
+            const newCheckSubmit = document.createElement("button");
+            newCheckSubmit.setAttribute("class", "newCheckSubmit")
+            newCheckSubmit.innerText = "Update Checklist";
+            checkDiv.append(createCheckInput())
+            checkDiv.append(newCheckSubmit)
+            newCheckSubmit.addEventListener("click", () => {
+                const newChecklistItems = document.querySelectorAll('input[name="newCheckInput"]');
+                newChecklistItems.forEach(input => {
+                    task.addChecklistItem(input.value)
+                    input.remove();
+                })
+                listDiv.innerHTML = "";
+                const updatedCheckList = task.checklist
+                updatedCheckList.forEach(item => {
+                    listDiv.append(createCheckItem(item))
+                })
+                
+                newCheckSubmit.remove()
+                console.log(task)
+            })
+        } else {
+            checkDiv.insertBefore(createCheckInput(), checkDiv.lastElementChild)
+        }
+        //submit
+        //task.addChecklistItem(value)
+    })
     // Classes
     taskCard.setAttribute("class", "taskCard")
     basicView.setAttribute("class", "basicView")
@@ -186,12 +219,13 @@ function createTaskCard(task, collectionInd) {
                                                   collectionInd)
     basicView.append(taskCheck, taskTitle, dueDate, taskCardButtons)
     notesDiv.append(priority, notesTitle, notes)
-    checkDiv.append(checkTitle)
+    checkTitleDiv.append(checkTitle, addCheck)
     if (checkList) {
         checkList.forEach(item => {
-            checkDiv.append(createCheckItem(item))
+            listDiv.append(createCheckItem(item))
         })
     };
+    checkDiv.append(checkTitleDiv, listDiv)
     taskDetails.append(notesDiv, checkDiv)
     taskCard.append(basicView, taskDetails)
    
@@ -214,17 +248,20 @@ function createTaskCardButtons(task, taskCard, basicView, taskTitle,
     expanders.forEach(item => {
         item.addEventListener("click", (e) => {
             e.stopPropagation(); // Allow button OR card to trigger the event
-            if (taskDetails.style.visibility === "hidden") {
-                expandButton.style.transform = "rotate(180deg)"
-                taskDetails.style.visibility = "visible";
-                taskDetails.style.height =  notesDiv.clientHeight + "px";
-                taskDetails.style.margin = "0.5rem";
-                return
+            const editCheck = document.getElementsByClassName("submitEdits");
+            if (editCheck.length < 1) { //Prevent expanding events while editing
+                if (taskDetails.style.visibility === "hidden") {
+                    expandButton.style.transform = "rotate(180deg)"
+                    taskDetails.style.visibility = "visible";
+                    taskDetails.style.height =  notesDiv.clientHeight + "px";
+                    taskDetails.style.margin = "0.5rem";
+                    return
+                }
+                expandButton.style.transform = "rotate(360deg)"
+                taskDetails.style.visibility ="hidden";
+                taskDetails.style.height = "0px"
+                taskDetails.style.margin = "0rem"
             }
-            expandButton.style.transform = "rotate(360deg)"
-            taskDetails.style.visibility ="hidden";
-            taskDetails.style.height = "0px"
-            taskDetails.style.margin = "0rem"
         });
     })
    
@@ -232,7 +269,6 @@ function createTaskCardButtons(task, taskCard, basicView, taskTitle,
         e.stopPropagation();
         if (checkForActiveForms()) {return};
         editButton.style.pointerEvents = 'none';
-        //basicView.style.pointerEvents = 'none'; //Prevent expanding events while editing
         editButton.style.opacity = '0.5';
         const editable = [];
         editable.push(taskTitle, notes)
