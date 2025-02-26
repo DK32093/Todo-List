@@ -30,7 +30,7 @@ function displayCollection(collection) {
             groupDisplay.innerHTML = "";
             deleteCollectionButton.remove();
             collectionTitle.innerText = "Create a new collection to get started!"
-            }
+        }
     })
     deleteCollectionButton.innerText = "Delete Collection"
     collectionHeader.innerHTML = "";
@@ -125,10 +125,6 @@ function createTaskCard(task, collectionInd) {
     const taskCheck = document.createElement("input")
     const taskTitle = document.createElement("h4");
     const dueDate = document.createElement("h5");
-    const taskButtonsDiv = document.createElement("div");
-    const expandButton = document.createElement("img");
-    const editButton = document.createElement("img");
-    const deleteButton = document.createElement("img");
     // detailed view elements
     const taskDetails = document.createElement("div")
     const notesDiv = document.createElement("div")
@@ -167,29 +163,80 @@ function createTaskCard(task, collectionInd) {
         }
         taskCard.classList.remove("crossed");
     });
+   
+    // detailed view params
+    taskDetails.style.visibility = "hidden"
+    taskDetails.style.height = "0px"
+    priority.innerText = "Priority: " + task.priority
+    notesTitle.innerText = "Notes"
+    notes.innerText = task.notes
+    checkTitle.innerText = "Checklist"
+    // Classes
+    taskCard.setAttribute("class", "taskCard")
+    basicView.setAttribute("class", "basicView")
+    taskTitle.setAttribute("class", "taskTitle")
+    dueDate.setAttribute("class", "dueDate")
+    taskDetails.setAttribute("class", "taskDetails")
+    notesDiv.setAttribute("class", "notesDiv")
+    checkDiv.setAttribute("class", "checkDiv")
+    // Append elements
+    const taskCardButtons = createTaskCardButtons(task, taskCard, basicView, 
+                                                  taskTitle, dueDate, taskDetails, 
+                                                  notesDiv, priority, notes, checkDiv, 
+                                                  collectionInd)
+    basicView.append(taskCheck, taskTitle, dueDate, taskCardButtons)
+    notesDiv.append(priority, notesTitle, notes)
+    checkDiv.append(checkTitle)
+    if (checkList) {
+        checkList.forEach(item => {
+            checkDiv.append(createCheckItem(item))
+        })
+    };
+    taskDetails.append(notesDiv, checkDiv)
+    taskCard.append(basicView, taskDetails)
+   
+    return taskCard
+}
+
+function createTaskCardButtons(task, taskCard, basicView, taskTitle, 
+                               dueDate, taskDetails, notesDiv, priority, 
+                               notes, checkDiv, collectionInd) {
+    const taskButtonsDiv = document.createElement("div");
+    const expandButton = document.createElement("img");
+    const editButton = document.createElement("img");
+    const deleteButton = document.createElement("img");
+
     expandButton.setAttribute("src", expandSVG)
     editButton.setAttribute("src", editSVG)
     deleteButton.setAttribute("src", deleteSVG)
     
-    expandButton.addEventListener("click", () => {
-        if (taskDetails.style.visibility === "hidden") {
-            taskDetails.style.visibility = "visible";
-            taskDetails.style.height =  notesDiv.clientHeight + "px";
-            taskDetails.style.margin = "0.5rem";
-            return
-        }
-        taskDetails.style.visibility ="hidden";
-        taskDetails.style.height = "0px"
-        taskDetails.style.margin = "0rem"
-    });
-    //edit
-    editButton.addEventListener("click", () => {
+    const expanders = [basicView, expandButton]
+    expanders.forEach(item => {
+        item.addEventListener("click", (e) => {
+            e.stopPropagation(); // Allow button OR card to trigger the event
+            if (taskDetails.style.visibility === "hidden") {
+                expandButton.style.transform = "rotate(180deg)"
+                taskDetails.style.visibility = "visible";
+                taskDetails.style.height =  notesDiv.clientHeight + "px";
+                taskDetails.style.margin = "0.5rem";
+                return
+            }
+            expandButton.style.transform = "rotate(360deg)"
+            taskDetails.style.visibility ="hidden";
+            taskDetails.style.height = "0px"
+            taskDetails.style.margin = "0rem"
+        });
+    })
+   
+    editButton.addEventListener("click", (e) => {
+        e.stopPropagation();
         if (checkForActiveForms()) {return};
         editButton.style.pointerEvents = 'none';
+        //basicView.style.pointerEvents = 'none'; //Prevent expanding events while editing
         editButton.style.opacity = '0.5';
         const editable = [];
         editable.push(taskTitle, notes)
-        const checks = Array.from(checkDiv.getElementsByTagName("label")) // get all descendents
+        const checks = Array.from(checkDiv.getElementsByTagName("label"))
         checks.forEach(item => {
             editable.push(item)
         })
@@ -228,7 +275,7 @@ function createTaskCard(task, collectionInd) {
         const medium = document.createElement("option");
         const high = document.createElement("option");
         low.innerText = "Low"
-        low.value = "Low"
+        low.value = "Low" // Value assignments required to set defeult selection
         medium.innerText = "Medium"
         medium.value = "Medium"
         high.innerText = "High"
@@ -272,44 +319,20 @@ function createTaskCard(task, collectionInd) {
     })
 
     deleteButton.addEventListener("click", () => {
-        const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
-        const group = collection.groupArray.find(group => group.index === task.groupID)
-        const tasksList = group.tasksList
-        tasksList.splice(tasksList.findIndex(t => t.index === task.index), 1);
-        task = null;
-        displayCollection(collection)
+        if (confirm("Are you sure you want to delete this task?")) {
+            const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
+            const group = collection.groupArray.find(group => group.index === task.groupID)
+            const tasksList = group.tasksList
+            tasksList.splice(tasksList.findIndex(t => t.index === task.index), 1);
+            task = null;
+            displayCollection(collection)
+        }
     })
-    // detailed view params
-    taskDetails.style.visibility = "hidden"
-    taskDetails.style.height = "0px"
-    priority.innerText = "Priority: " + task.priority
-    notesTitle.innerText = "Notes"
-    notes.innerText = task.notes
-    checkTitle.innerText = "Checklist"
-    // Classes
-    taskCard.setAttribute("class", "taskCard")
-    basicView.setAttribute("class", "basicView")
-    taskTitle.setAttribute("class", "taskTitle")
-    dueDate.setAttribute("class", "dueDate")
-    taskButtonsDiv.setAttribute("class", "taskButtonDiv")
+
+    taskButtonsDiv.setAttribute("class", "taskButtonDiv");
     deleteButton.setAttribute("class", "deleteButton");
-    taskDetails.setAttribute("class", "taskDetails")
-    notesDiv.setAttribute("class", "notesDiv")
-    checkDiv.setAttribute("class", "checkDiv")
-    // Append elements
-    taskButtonsDiv.append(expandButton, editButton, deleteButton)
-    basicView.append(taskCheck, taskTitle, dueDate, taskButtonsDiv)
-    notesDiv.append(priority, notesTitle, notes)
-    checkDiv.append(checkTitle)
-    if (checkList) {
-        checkList.forEach(item => {
-            checkDiv.append(createCheckItem(item))
-        })
-    };
-    taskDetails.append(notesDiv, checkDiv)
-    taskCard.append(basicView, taskDetails)
-   
-    return taskCard
+    taskButtonsDiv.append(expandButton, editButton, deleteButton);
+    return taskButtonsDiv;
 }
 
 function createCheckItem(item) {

@@ -44,7 +44,7 @@ button, .deleteButton, .editButton, .expandButton {
 
 .basicView {
     display: grid;
-    grid-template-columns: 1fr 3fr 1fr 1fr;
+    grid-template-columns: 1fr 4fr 2fr 2fr;
     align-items: center;
     margin: 0.5rem;
 }
