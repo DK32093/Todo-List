@@ -2,6 +2,7 @@
 
 import { collection, defaultLibrary, toDoGroup, toDoTask} from "./classes.js"
 import { createTaskForm, createCheckInput } from "./forms.js";
+import { garbagePrep } from "./delete.js";
 import collectionSVG from "./assets/Collection.svg"
 import deleteSVG from "./assets/delete.svg"
 import expandSVG from "./assets/expand.svg"
@@ -10,32 +11,40 @@ import editSVG from "./assets/edit.svg"
 // Collections
 
 function displayCollection(collection) {
+    const collectionContainer = document.querySelector("#collectionContainer");
     const groupDisplay = document.querySelector(".groupDisplay");
-    const collectionHeader = document.querySelector("#collectionHeader")
+    const collectionHeader = document.querySelector("#collectionHeader");
     const collectionTitle = document.createElement("h1");
-    const deleteCollectionButton = document.createElement("button")
-    const collectionArray = defaultLibrary.collectionArray
-    const collectionInd = collection.index
+    const deleteCollectionButton = document.createElement("button");
+    const collectionArray = defaultLibrary.collectionArray;
+    const collectionInd = collection.index;
     const groups = collection.groupArray;
-    collectionTitle.innerText = collection.name
+    collectionTitle.innerText = collection.name;
     deleteCollectionButton.addEventListener("click", () => {
         if (confirm("Are you sure you want to delete this collection?")) {
             collectionArray.splice(collectionArray.findIndex(c => c.index === collectionInd), 1) // remove from array
-            collection = null; // allow garbage collection
+            collection = null;
             createCollectionMenu(collectionArray); // update menu
             if (collectionArray.length > 0) {
-                    displayCollection(collectionArray[0])
-                    return
+                displayCollection(collectionArray[0])
+                return
             }
-            groupDisplay.innerHTML = "";
-            deleteCollectionButton.remove();
+            Array.from(groupDisplay.children).forEach(child => {
+                garbagePrep(child);
+            });
+            
+            groupDisplay.innerText = "";
+            //deleteCollectionButton.remove();
+            //garbagePrep(deleteCollectionButton)
+            
             collectionTitle.innerText = "Create a new collection to get started!"
         }
     })
     deleteCollectionButton.innerText = "Delete Collection"
     collectionHeader.innerHTML = "";
-    collectionHeader.append(collectionTitle, deleteCollectionButton);
-    groupDisplay.innerHTML = "";
+    collectionHeader.append(collectionTitle);
+    groupDisplay.innerText = "";
+    groupDisplay.append(deleteCollectionButton)
     groups.forEach(group => {
         groupDisplay.append(createGroupCard(group, collectionInd))
     });
