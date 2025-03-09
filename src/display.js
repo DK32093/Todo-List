@@ -10,6 +10,17 @@ import editSVG from "./assets/edit.svg"
 
 // Collections
 
+function bindHandler(handler, ...args) {
+    return function (event) {
+        handler(event, ...args);
+    };
+}
+
+
+
+
+    
+// revesit - the delete button still shows as a detached node
 function displayCollection(collection) {
     const collectionContainer = document.querySelector("#collectionContainer");
     const groupDisplay = document.querySelector(".groupDisplay");
@@ -20,26 +31,27 @@ function displayCollection(collection) {
     const collectionInd = collection.index;
     const groups = collection.groupArray;
     collectionTitle.innerText = collection.name;
-    deleteCollectionButton.addEventListener("click", () => {
+
+    function handleDeleteClick(event, collection, collectionArray, groupDisplay) {
         if (confirm("Are you sure you want to delete this collection?")) {
-            collectionArray.splice(collectionArray.findIndex(c => c.index === collectionInd), 1) // remove from array
+            event.currentTarget.removeEventListener("click", boundHandleDeleteClick); // Remove listener
+            collectionArray.splice(collectionArray.findIndex(c => c.index === collectionInd), 1); // Remove from array
             collection = null;
-            createCollectionMenu(collectionArray); // update menu
+            createCollectionMenu(collectionArray); // Update menu
+    
             if (collectionArray.length > 0) {
-                displayCollection(collectionArray[0])
-                return
+                displayCollection(collectionArray[0]);
+                return;
             }
-            Array.from(groupDisplay.children).forEach(child => {
-                garbagePrep(child);
-            });
             
-            groupDisplay.innerText = "";
-            //deleteCollectionButton.remove();
-            //garbagePrep(deleteCollectionButton)
-            
-            collectionTitle.innerText = "Create a new collection to get started!"
+            Array.from(groupDisplay.children).forEach(child => garbagePrep(child));
+            groupDisplay.innerText = ""; // Clear content
+            collectionTitle.innerText = "Create a new collection to get started!";
         }
-    })
+    };
+
+    const boundHandleDeleteClick = bindHandler(handleDeleteClick, collection, collectionArray, groupDisplay);
+    deleteCollectionButton.addEventListener("click", boundHandleDeleteClick)
     deleteCollectionButton.innerText = "Delete Collection"
     collectionHeader.innerHTML = "";
     collectionHeader.append(collectionTitle);

@@ -1,27 +1,27 @@
-// Function to recursively remove event listeners and set elements to null
 export function garbagePrep(element) {
-    if (element.nodeType !== Node.ELEMENT_NODE) {
-        console.error('Not a valid element node');
-        return;
-      }
-    // Shallow clone the element to remove event listeners
-    let newElement = element.cloneNode(false);
-    
-    // Loop through all children of the element and recursively call the function
-    Array.from(element.children).forEach(child => {
-      garbagePrep(child);
-    });
-  
-    // Replace the element with its clone to remove event listeners
-    if (element.parentNode) {
-        console.log(element + "= element")
-        console.log(element.parentNode + " = parent node")
-      element.parentNode.replaceChild(newElement, element);
-    } else {
-        console.log("No parent")
-    }
-    
-    // Set the cloned element to null to prepare for garbage collection
-    newElement = null;
-    element = null;
+  if (element.nodeType !== Node.ELEMENT_NODE) {
+      console.error('Not a valid element node');
+      return;
   }
+
+  // Remove all event listeners from the element (must know listener types)
+  const eventTypes = ['click', 'mouseover', 'keydown']; // Add all types of listeners your app uses
+  eventTypes.forEach(type => {
+      element.removeEventListener(type, () => {}); // Replace with the actual handler reference
+  });
+
+  // Recursively call the function for all children
+  Array.from(element.children).forEach(child => {
+      garbagePrep(child);
+  });
+
+  // Remove the element from the DOM if necessary
+  if (element.parentNode) {
+      element.parentNode.removeChild(element);
+  } else {
+      console.log("No parent");
+  }
+
+  // Nullify the element reference
+  element = null;
+}
