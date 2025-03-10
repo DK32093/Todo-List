@@ -9,6 +9,10 @@ class library {
     addCollection(collection) {
         this.collectionArray.push(collection)
     }
+
+    deleteCollection(collection) {
+        this.collectionArray.splice(this.collectionArray.findIndex(c => c.index === collection.index), 1); 
+    }
 }
 
 class collection {
@@ -22,6 +26,10 @@ class collection {
     addGroup(group) {
         this.groupArray.push(group);
         group.collectionID = this.index;
+    }
+
+    deleteGroup(group) {
+        this.groupArray.splice(this.groupArray.findIndex(g => g.index === group.index), 1)
     }
 
 }
@@ -41,7 +49,7 @@ class toDoGroup {
     }
 
     deleteTask(task) {
-        this.tasksList.splice(task.index, 1)
+        this.tasksList.splice(this.tasksList.findIndex(t => t.index === task.index), 1)
     }
   }
 

@@ -16,10 +16,6 @@ function bindHandler(handler, ...args) {
     };
 }
 
-
-
-
-    
 // revesit - the delete button still shows as a detached node
 function displayCollection(collection) {
     const collectionContainer = document.querySelector("#collectionContainer");
@@ -35,7 +31,7 @@ function displayCollection(collection) {
     function handleDeleteClick(event, collection, collectionArray, groupDisplay) {
         if (confirm("Are you sure you want to delete this collection?")) {
             event.currentTarget.removeEventListener("click", boundHandleDeleteClick); // Remove listener
-            collectionArray.splice(collectionArray.findIndex(c => c.index === collectionInd), 1); // Remove from array
+            defaultLibrary.deleteCollection(collection)
             collection = null;
             createCollectionMenu(collectionArray); // Update menu
     
@@ -44,7 +40,7 @@ function displayCollection(collection) {
                 return;
             }
             
-            Array.from(groupDisplay.children).forEach(child => garbagePrep(child));
+            //Array.from(groupDisplay.children).forEach(child => garbagePrep(child));
             groupDisplay.innerText = ""; // Clear content
             collectionTitle.innerText = "Create a new collection to get started!";
         }
@@ -53,7 +49,7 @@ function displayCollection(collection) {
     const boundHandleDeleteClick = bindHandler(handleDeleteClick, collection, collectionArray, groupDisplay);
     deleteCollectionButton.addEventListener("click", boundHandleDeleteClick)
     deleteCollectionButton.innerText = "Delete Collection"
-    collectionHeader.innerHTML = "";
+    collectionHeader.innerText = "";
     collectionHeader.append(collectionTitle);
     groupDisplay.innerText = "";
     groupDisplay.append(deleteCollectionButton)
@@ -116,10 +112,10 @@ function createGroupCard(group, collectionInd) {
     groupDeleteButton.addEventListener("click", () => {
         if (confirm("Are you sure you want to delete this group?")) {
             const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
-            const groupList = collection.groupArray
-            groupList.splice(groupList.findIndex(g => g.index === groupInd), 1)
+            collection.deleteGroup(group);
             group = null;
-            displayCollection(collection)
+            //garbagePrep(groupCard);
+            displayCollection(collection);
         }
     })
     return groupCard
@@ -379,8 +375,7 @@ function createTaskCardButtons(task, taskCard, basicView, taskTitle,
         if (confirm("Are you sure you want to delete this task?")) {
             const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
             const group = collection.groupArray.find(group => group.index === task.groupID)
-            const tasksList = group.tasksList
-            tasksList.splice(tasksList.findIndex(t => t.index === task.index), 1);
+            group.deleteTask(task);
             task = null;
             displayCollection(collection)
         }
