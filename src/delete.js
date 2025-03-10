@@ -5,16 +5,20 @@ export function garbagePrep(element) {
   }
 
   // Remove all event listeners from the element (must know listener types)
-  const eventTypes = ['click', 'mouseover', 'keydown']; // Add all types of listeners your app uses
-  eventTypes.forEach(type => {
-      element.removeEventListener(type, () => {}); // Replace with the actual handler reference
-  });
+//   const eventTypes = ['click', 'mouseover', 'keydown']; // Add all types of listeners your app uses
+//   eventTypes.forEach(type => {
+//       element.removeEventListener(type, () => {}); // Replace with the actual handler reference
+//   });
+
+    
 
   // Recursively call the function for all children
   Array.from(element.children).forEach(child => {
       garbagePrep(child);
   });
 
+    let clonedElement = element.cloneNode(true);
+    element.replaceWith(clonedElement);
   // Remove the element from the DOM if necessary
   if (element.parentNode) {
       element.parentNode.removeChild(element);
@@ -24,4 +28,5 @@ export function garbagePrep(element) {
 
   // Nullify the element reference
   element = null;
+  clonedElement = null;
 }

@@ -65,6 +65,7 @@ function newCollectionFromForm() {
     defaultLibrary.addCollection(newCollection);
     createCollectionMenu(defaultLibrary.collectionArray)
     displayCollection(newCollection)
+    console.log("ran", defaultLibrary)
 }
 
 function createCollectionMenu(collectionArray) {
@@ -114,7 +115,7 @@ function createGroupCard(group, collectionInd) {
             const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
             collection.deleteGroup(group);
             group = null;
-            //garbagePrep(groupCard);
+            garbagePrep(groupCard);
             displayCollection(collection);
         }
     })
