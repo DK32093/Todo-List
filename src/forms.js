@@ -14,6 +14,7 @@ function createCollectionForm() {
     dialog.setAttribute("id", "collectionDialog")
     const newCollectionForm = document.createElement("form")
     newCollectionForm.setAttribute("method", "dialog")
+    newCollectionForm.setAttribute("id", "newCollectionForm")
     const display = document.getElementById("displayArea")
 
     const collectionName = document.createElement("input");
@@ -43,11 +44,6 @@ function createCollectionForm() {
 }
 
 function createGroupForm() { 
-    // let dialogCheck = document.querySelector("#groupDialog")
-    // if (dialogCheck) {
-    //     dialogCheck.remove()
-    //     dialogCheck = null;
-    // }
     const dialog = document.createElement("dialog")
     dialog.setAttribute("id", "groupDialog")
     const newGroupForm = document.createElement("form")
@@ -101,7 +97,6 @@ function createGroupForm() {
     })
     groupSubmitButton.addEventListener("click", () => {
         newGroupFromForm();
-        updateSelectOptions();
     });
 
     newGroupForm.append(groupTitleLab, groupTitle,

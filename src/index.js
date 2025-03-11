@@ -11,22 +11,24 @@ const newGroupButton = document.getElementById("newGroupButton")
 
 newCollectionButton.addEventListener("click", () => {
     if (checkForActiveForms()) {return};
-    const newCollectionForm = document.getElementById("collectionDialog")
-    newCollectionForm.showModal()
-})
+    const newCollectionDialog = document.getElementById("collectionDialog");
+    const newCollectionForm = document.getElementById("newCollectionForm");
+    newCollectionForm.reset();
+    newCollectionDialog.showModal();
+});
 
 newGroupButton.addEventListener("click", () => {
     if (checkForActiveForms()) {return};
     if (defaultLibrary.collectionArray.length < 1) {
         alert("Please create a new collection to store your groups!")
         return
-    }
-    const newGroupDialog = document.getElementById("groupDialog")
-    const newGRoupForm = document.getElementById("newGroupForm")
-    newGRoupForm.reset()
-    newGroupDialog.showModal()
-})
+    };
+    const newGroupDialog = document.getElementById("groupDialog");
+    const newGroupForm = document.getElementById("newGroupForm");
+    newGroupForm.reset();
+    newGroupDialog.showModal();
+});
 
-const firstCollection = defaultLibrary.collectionArray[0]
-displayCollection(firstCollection)
-console.log(firstCollection)
+const firstCollection = defaultLibrary.collectionArray[0];
+displayCollection(firstCollection);
+console.log(firstCollection);
