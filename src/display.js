@@ -3,6 +3,7 @@
 import { collection, defaultLibrary, toDoGroup, toDoTask} from "./classes.js"
 import { createTaskForm, createCheckInput } from "./forms.js";
 import { garbagePrep } from "./delete.js";
+import { handleDeleteCollection, handleDeleteGroup } from "./listeners.js";
 import collectionSVG from "./assets/Collection.svg"
 import deleteSVG from "./assets/delete.svg"
 import expandSVG from "./assets/expand.svg"
@@ -27,28 +28,10 @@ function displayCollection(collection) {
     const collectionInd = collection.index;
     const groups = collection.groupArray;
     collectionTitle.innerText = collection.name;
-
-    function handleDeleteClick(event, collection, collectionArray, groupDisplay) {
-        if (confirm("Are you sure you want to delete this collection?")) {
-            event.currentTarget.removeEventListener("click", boundHandleDeleteClick); // Remove listener
-            defaultLibrary.deleteCollection(collection)
-            collection = null;
-            createCollectionMenu(collectionArray); // Update menu
-    
-            if (collectionArray.length > 0) {
-                displayCollection(collectionArray[0]);
-                return;
-            }
-            
-            //Array.from(groupDisplay.children).forEach(child => garbagePrep(child));
-            groupDisplay.innerText = ""; // Clear content
-            collectionTitle.innerText = "Create a new collection to get started!";
-        }
-    };
-
-    const boundHandleDeleteClick = bindHandler(handleDeleteClick, collection, collectionArray, groupDisplay);
-    deleteCollectionButton.addEventListener("click", boundHandleDeleteClick)
+    collectionTitle.setAttribute("id", "collectionTitle")
+    deleteCollectionButton.addEventListener("click", handleDeleteCollection)
     deleteCollectionButton.innerText = "Delete Collection"
+    deleteCollectionButton.setAttribute("collectionind", collection.index)
     collectionHeader.innerText = "";
     collectionHeader.append(collectionTitle);
     groupDisplay.innerText = "";
@@ -109,16 +92,10 @@ function createGroupCard(group, collectionInd) {
         groupCard.append(createTaskCard(task, collectionInd))
     })
     groupDeleteButton.setAttribute("class", "groupDeleteButton");
+    groupDeleteButton.setAttribute("collectionind", collectionInd)
+    groupDeleteButton.setAttribute("groupind", groupInd)
     groupDeleteButton.innerText = "Delete Group"
-    groupDeleteButton.addEventListener("click", () => {
-        if (confirm("Are you sure you want to delete this group?")) {
-            const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
-            collection.deleteGroup(group);
-            group = null;
-            garbagePrep(groupCard);
-            displayCollection(collection);
-        }
-    })
+    groupDeleteButton.addEventListener("click", handleDeleteGroup)
     return groupCard
 }
 
