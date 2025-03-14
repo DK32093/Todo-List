@@ -3,19 +3,13 @@
 import { collection, defaultLibrary, toDoGroup, toDoTask} from "./classes.js"
 import { createTaskForm, createCheckInput } from "./forms.js";
 import { garbagePrep } from "./delete.js";
-import { handleDeleteCollection, handleDeleteGroup } from "./listeners.js";
+import { handleDeleteCollection, handleDeleteGroup, displayCollectionFromMenu } from "./listeners.js";
 import collectionSVG from "./assets/Collection.svg"
 import deleteSVG from "./assets/delete.svg"
 import expandSVG from "./assets/expand.svg"
 import editSVG from "./assets/edit.svg"
 
 // Collections
-
-function bindHandler(handler, ...args) {
-    return function (event) {
-        handler(event, ...args);
-    };
-}
 
 // revesit - the delete button still shows as a detached node
 function displayCollection(collection) {
@@ -48,24 +42,26 @@ function newCollectionFromForm() {
     defaultLibrary.addCollection(newCollection);
     createCollectionMenu(defaultLibrary.collectionArray)
     displayCollection(newCollection)
-    console.log("ran", defaultLibrary)
 }
 
 function createCollectionMenu(collectionArray) {
     const collectionMenu = document.querySelector("#collectionMenu");
+    const currentMenuItems = Array.from(collectionMenu.children)
+    currentMenuItems.forEach(i => {
+        i.removeEventListener("click", displayCollectionFromMenu)
+    })
     collectionMenu.innerHTML = "";
     collectionArray.forEach(c => {
         const newItem = document.createElement("div");
         const title = document.createElement("div")
         const svg = document.createElement("img");
         newItem.setAttribute("class", "collectionMenuItem");
+        newItem.setAttribute("collectionind", c.index)
         title.innerHTML = c.name;
         svg.setAttribute("src", collectionSVG)
         newItem.append(svg, title)
         collectionMenu.append(newItem);
-        newItem.addEventListener("click", () => {
-            displayCollection(c)
-        })
+        newItem.addEventListener("click", displayCollectionFromMenu)
     })
 }
 

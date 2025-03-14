@@ -49,5 +49,12 @@ function handleDeleteCollection(event) {
     }
 };
 
-export { handleDeleteCollection, handleDeleteGroup }
+function displayCollectionFromMenu(event) {
+    const collectionArray = defaultLibrary.collectionArray;
+    const collectionInd = parseInt(event.currentTarget.getAttribute("collectionind"));
+    const collection = collectionArray.find(collection => collection.index === collectionInd);
+    displayCollection(collection);
+}
+
+export { handleDeleteCollection, handleDeleteGroup, displayCollectionFromMenu }
 
