@@ -1,6 +1,7 @@
 import { defaultLibrary } from "./classes";
-import { displayCollection, createCollectionMenu } from "./display";
+import { displayCollection, createCollectionMenu, checkForActiveForms } from "./display";
 import { garbagePrep } from "./delete";
+import { createTaskForm } from "./forms";
 
 // Delete buttons
 
@@ -8,14 +9,16 @@ function handleDeleteGroup(event) {
     if (confirm("Are you sure you want to delete this group?")) {
         const collectionInd = parseInt(event.target.getAttribute("collectionind"));
         const groupInd = parseInt(event.target.getAttribute("groupind"));
+        const groupCard  = event.target.closest(".groupCard")
         const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
         let group = collection.groupArray.find(group => group.index === groupInd);
         collection.deleteGroup(group);
-        group = null;
-
+        //garbagePrep(groupCard);
         let deleteGroupButton = event.target;
         deleteGroupButton.removeEventListener("click", handleDeleteGroup)
-        // garbagePrep(groupCard);
+        deleteGroupButton.remove()
+        deleteGroupButton = null
+        
         displayCollection(collection);
     }
 }
@@ -49,6 +52,8 @@ function handleDeleteCollection(event) {
     }
 };
 
+// Display buttons
+
 function displayCollectionFromMenu(event) {
     const collectionArray = defaultLibrary.collectionArray;
     const collectionInd = parseInt(event.currentTarget.getAttribute("collectionind"));
@@ -56,5 +61,27 @@ function displayCollectionFromMenu(event) {
     displayCollection(collection);
 }
 
-export { handleDeleteCollection, handleDeleteGroup, displayCollectionFromMenu }
+function handleAddNewTask(event) {
+    if (checkForActiveForms()) {return};
+    const collectionInd = parseInt(event.currentTarget.getAttribute("collectionind"));
+    const groupInd = parseInt(event.currentTarget.getAttribute("groupind"));
+    createTaskForm(event, groupInd, collectionInd)
+}
+
+function toggleCrossedClass(event) {
+    const taskCheck = event.target
+    const taskCard = event.target.closest(".taskCard")
+    if (taskCheck.checked) {
+        taskCard.classList.add("crossed")
+        return
+    }
+    taskCard.classList.remove("crossed");
+}
+
+
+export { handleDeleteCollection, 
+         handleDeleteGroup, 
+         displayCollectionFromMenu,
+         handleAddNewTask,
+         toggleCrossedClass }
 

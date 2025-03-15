@@ -11,7 +11,8 @@ class library {
     }
 
     deleteCollection(collection) {
-        this.collectionArray.splice(this.collectionArray.findIndex(c => c.index === collection.index), 1); 
+        this.collectionArray.splice(this.collectionArray.findIndex(c => c.index === collection.index), 1);
+        collection = null; 
     }
 }
 
@@ -29,7 +30,8 @@ class collection {
     }
 
     deleteGroup(group) {
-        this.groupArray.splice(this.groupArray.findIndex(g => g.index === group.index), 1)
+        this.groupArray.splice(this.groupArray.findIndex(g => g.index === group.index), 1);
+        group = null;
     }
 
 }
@@ -50,6 +52,7 @@ class toDoGroup {
 
     deleteTask(task) {
         this.tasksList.splice(this.tasksList.findIndex(t => t.index === task.index), 1)
+        task = null;
     }
   }
 

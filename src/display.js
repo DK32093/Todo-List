@@ -3,7 +3,8 @@
 import { collection, defaultLibrary, toDoGroup, toDoTask} from "./classes.js"
 import { createTaskForm, createCheckInput } from "./forms.js";
 import { garbagePrep } from "./delete.js";
-import { handleDeleteCollection, handleDeleteGroup, displayCollectionFromMenu } from "./listeners.js";
+import { handleDeleteCollection, handleDeleteGroup, displayCollectionFromMenu, 
+         handleAddNewTask, toggleCrossedClass } from "./listeners.js";
 import collectionSVG from "./assets/Collection.svg"
 import deleteSVG from "./assets/delete.svg"
 import expandSVG from "./assets/expand.svg"
@@ -76,10 +77,9 @@ function createGroupCard(group, collectionInd) {
     const addTaskButton = document.createElement("button");
     const groupDeleteButton = document.createElement("button")
     addTaskButton.innerText = "Add New Task";
-    addTaskButton.addEventListener("click", (e) => {
-        if (checkForActiveForms()) {return};
-        createTaskForm(e, groupInd, collectionInd);
-    });
+    addTaskButton.setAttribute("collectionind", collectionInd)
+    addTaskButton.setAttribute("groupind", groupInd)
+    addTaskButton.addEventListener("click", handleAddNewTask);
     title.textContent = group.groupTitle
     subTitle.textContent = group.subTitle
     groupCard.setAttribute("class", "groupCard");
@@ -149,14 +149,7 @@ function createTaskCard(task, collectionInd) {
         name: "taskCheck",
         id: "taskCheck",
     })
-    taskCheck.addEventListener("click", () => {
-        if (taskCheck.checked) {
-            taskCard.classList.add("crossed")
-            return
-        }
-        taskCard.classList.remove("crossed");
-    });
-   
+    taskCheck.addEventListener("click", toggleCrossedClass);
     // detailed view params
     taskDetails.style.visibility = "hidden"
     taskDetails.style.height = "0px"
