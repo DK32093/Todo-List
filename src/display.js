@@ -4,7 +4,7 @@ import { collection, defaultLibrary, toDoGroup, toDoTask} from "./classes.js"
 import { createTaskForm, createCheckInput } from "./forms.js";
 import { garbagePrep } from "./delete.js";
 import { handleDeleteCollection, handleDeleteGroup, displayCollectionFromMenu, 
-         handleAddNewTask, toggleCrossedClass } from "./listeners.js";
+         handleAddNewTask, toggleCrossedClass, toggleTaskExpand } from "./listeners.js";
 import collectionSVG from "./assets/Collection.svg"
 import deleteSVG from "./assets/delete.svg"
 import expandSVG from "./assets/expand.svg"
@@ -227,26 +227,12 @@ function createTaskCardButtons(task, taskCard, basicView, taskTitle,
     expandButton.setAttribute("src", expandSVG)
     editButton.setAttribute("src", editSVG)
     deleteButton.setAttribute("src", deleteSVG)
+
+    expandButton.setAttribute("class", "expandButton")
     
     const expanders = [basicView, expandButton]
     expanders.forEach(item => {
-        item.addEventListener("click", (e) => {
-            e.stopPropagation(); // Allow button OR card to trigger the event
-            const editCheck = document.getElementsByClassName("submitEdits");
-            if (editCheck.length < 1) { //Prevent expanding events while editing
-                if (taskDetails.style.visibility === "hidden") {
-                    expandButton.style.transform = "rotate(180deg)"
-                    taskDetails.style.visibility = "visible";
-                    taskDetails.style.height =  notesDiv.clientHeight + "px";
-                    taskDetails.style.margin = "0.5rem";
-                    return
-                }
-                expandButton.style.transform = "rotate(360deg)"
-                taskDetails.style.visibility ="hidden";
-                taskDetails.style.height = "0px"
-                taskDetails.style.margin = "0rem"
-            }
-        });
+        item.addEventListener("click", toggleTaskExpand);
     })
    
     editButton.addEventListener("click", (e) => {
@@ -339,6 +325,8 @@ function createTaskCardButtons(task, taskCard, basicView, taskTitle,
     })
 
     deleteButton.addEventListener("click", () => {
+        // Stop propogation once moved to prevent double alert message
+        if (checkForActiveForms()) {return};
         if (confirm("Are you sure you want to delete this task?")) {
             const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
             const group = collection.groupArray.find(group => group.index === task.groupID)
@@ -402,7 +390,8 @@ function newTaskFromForm(groupInd, collectionInd) {
 function checkForActiveForms() {
     const editCheck = document.getElementsByClassName("submitEdits");
     const formCheck = document.querySelector(".taskFormDiv");
-    if (formCheck || editCheck.length > 0) {
+    const checklistCheck = document.querySelector(".newCheckSubmit")
+    if (formCheck || checklistCheck || editCheck.length > 0) {
         alert("Please finish editing the current task");
         return true
     }

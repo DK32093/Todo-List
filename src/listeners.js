@@ -78,10 +78,36 @@ function toggleCrossedClass(event) {
     taskCard.classList.remove("crossed");
 }
 
+// Task card buttons
+
+function toggleTaskExpand(event) {
+    event.stopPropagation(); // Allow button OR card to trigger the event
+    if (checkForActiveForms()) {return};
+    const editCheck = document.getElementsByClassName("submitEdits"); // Update to include check for checklist editing
+    const taskCard = event.target.closest(".taskCard");
+    const taskDetails  = taskCard.querySelector(".taskDetails");
+    const expandButton  = taskCard.querySelector(".expandButton");
+    const notesDiv  = taskCard.querySelector(".notesDiv");
+    if (editCheck.length < 1) { //Prevent expanding events while editing
+        if (taskDetails.style.visibility === "hidden") {
+            expandButton.style.transform = "rotate(180deg)"
+            taskDetails.style.visibility = "visible";
+            taskDetails.style.height =  notesDiv.clientHeight + "px";
+            taskDetails.style.margin = "0.5rem";
+            return
+        }
+        expandButton.style.transform = "rotate(360deg)"
+        taskDetails.style.visibility ="hidden";
+        taskDetails.style.height = "0px"
+        taskDetails.style.margin = "0rem"
+    }
+}
+
 
 export { handleDeleteCollection, 
          handleDeleteGroup, 
          displayCollectionFromMenu,
          handleAddNewTask,
-         toggleCrossedClass }
+         toggleCrossedClass,
+         toggleTaskExpand }
 
