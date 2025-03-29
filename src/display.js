@@ -3,8 +3,8 @@
 import { collection, defaultLibrary, toDoGroup, toDoTask} from "./classes.js"
 import { createTaskForm, createCheckInput } from "./forms.js";
 import { garbagePrep } from "./delete.js";
-import { handleDeleteCollection, handleDeleteGroup, handleDeleteTask, displayCollectionFromMenu, 
-         handleAddNewTask, toggleCrossedClass, toggleTaskExpand } from "./listeners.js";
+import { handleDeleteCollection, handleDeleteGroup, handleDeleteTask, handleEditTask, 
+         displayCollectionFromMenu, handleAddNewTask, toggleCrossedClass, toggleTaskExpand } from "./listeners.js";
 import collectionSVG from "./assets/Collection.svg"
 import deleteSVG from "./assets/delete.svg"
 import expandSVG from "./assets/expand.svg"
@@ -194,13 +194,12 @@ function createTaskCard(task, groupInd, collectionInd) {
     taskTitle.setAttribute("class", "taskTitle")
     dueDate.setAttribute("class", "dueDate")
     taskDetails.setAttribute("class", "taskDetails")
+    priority.setAttribute("class", "priority")
     notesDiv.setAttribute("class", "notesDiv")
+    notes.setAttribute("class", "taskNotes")
     checkDiv.setAttribute("class", "checkDiv")
     // Append elements
-    const taskCardButtons = createTaskCardButtons(task, taskCard, basicView, 
-                                                  taskTitle, dueDate, taskDetails, 
-                                                  notesDiv, priority, notes, checkDiv, 
-                                                  groupInd, collectionInd)
+    const taskCardButtons = createTaskCardButtons(task, basicView, groupInd, collectionInd)
     basicView.append(taskCheck, taskTitle, dueDate, taskCardButtons)
     notesDiv.append(priority, notesTitle, notes)
     checkTitleDiv.append(checkTitle, addCheck)
@@ -216,9 +215,8 @@ function createTaskCard(task, groupInd, collectionInd) {
     return taskCard
 }
 
-function createTaskCardButtons(task, taskCard, basicView, taskTitle, 
-                               dueDate, taskDetails, notesDiv, priority, 
-                               notes, checkDiv, groupInd, collectionInd) {
+function createTaskCardButtons(task, basicView, groupInd, collectionInd) {
+    // Button elements
     const taskButtonsDiv = document.createElement("div");
     const expandButton = document.createElement("img");
     const editButton = document.createElement("img");
@@ -230,109 +228,26 @@ function createTaskCardButtons(task, taskCard, basicView, taskTitle,
     deleteButton.setAttribute("src", deleteSVG)
 
     // Attributes
-    deleteButton.setAttribute("collectionind", collectionInd)
-    deleteButton.setAttribute("groupind", groupInd)
-    deleteButton.setAttribute("taskid", task.index)
-    expandButton.setAttribute("class", "expandButton")
+    const buttonList = [deleteButton, editButton]
+    buttonList.forEach(button => {
+        button.setAttribute("collectionind", collectionInd)
+        button.setAttribute("groupind", groupInd)
+        button.setAttribute("taskid", task.index)
+    })
     
+    // classes
+    expandButton.setAttribute("class", "expandButton");
+    taskButtonsDiv.setAttribute("class", "taskButtonDiv");
+    deleteButton.setAttribute("class", "deleteButton");
+    
+    // listeners
     const expanders = [basicView, expandButton]
     expanders.forEach(item => {
         item.addEventListener("click", toggleTaskExpand);
     })
-   
-    editButton.addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (checkForActiveForms()) {return};
-        editButton.style.pointerEvents = 'none';
-        editButton.style.opacity = '0.5';
-        const editable = [];
-        editable.push(taskTitle, notes)
-        const checks = Array.from(checkDiv.getElementsByTagName("label"))
-        checks.forEach(item => {
-            editable.push(item)
-        })
-        editable.forEach(item => {
-            item.contentEditable = true;
-            item.style.borderBottom = "solid white 1px";
-            item.addEventListener("keydown", (e) => {
-                if(e.key === "Enter") {
-                    e.preventDefault();
-                }
-            })
-        })
-
-        const editDueDate = document.createElement("input");
-        const dueDateLab = document.createElement("label");
-        dueDateLab.setAttribute("for", "editDueDate")
-        dueDateLab.innerText = "Due:"
-        Object.assign(editDueDate, {
-            type: "date",
-            id: "editDueDate", 
-            name: "editDueDate",
-            value: task.dueDate
-        })
-        dueDate.innerText = "";
-        dueDate.append(dueDateLab, editDueDate)
-
-        const editPriority = document.createElement("select");
-        const priorityLab = document.createElement("label");
-        priorityLab.setAttribute("for", "editPriority")
-        priorityLab.innerText = "Priority: "
-        Object.assign(editPriority, {
-            name: "editPriority",
-            id: "editPriority"
-        })
-        const low = document.createElement("option");
-        const medium = document.createElement("option");
-        const high = document.createElement("option");
-        low.innerText = "Low"
-        low.value = "Low" // Value assignments required to set defeult selection
-        medium.innerText = "Medium"
-        medium.value = "Medium"
-        high.innerText = "High"
-        high.value = "High"
-        editPriority.append(low, medium, high)
-        editPriority.value = task.priority
-        priority.innerText = "";
-        priority.append(priorityLab, editPriority)
-
-        const submitEdits = document.createElement("button")
-        submitEdits.classList.add("submitEdits")
-        submitEdits.innerText = "Finished Editing Task"
-        submitEdits.addEventListener("click", () => {
-           const editedTitle = taskCard.getElementsByClassName("taskTitle")[0].innerText
-           const editedDueDate = taskCard.querySelector("#editDueDate").value
-           const editedPriority= taskCard.querySelector("#editPriority").value
-           const editedNotes = notes.innerText
-           const editedChecklist = Array.from(checkDiv.getElementsByTagName("label"))
-           const editedTask = new toDoTask(editedTitle, editedPriority)
-           editedTask.groupID = task.groupID;
-           editedTask.setDate(editedDueDate);
-           if (editedTask.dueDate.length < 1) {editedTask.dueDate = "None"}
-           editedTask.addNotes(editedNotes);
-           editedChecklist.forEach(input => {
-              editedTask.addChecklistItem(input.innerText)
-           })
-           // replace task
-           const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
-           const group = collection.groupArray.find(group => group.index === task.groupID)
-           const tasksList = group.tasksList
-           tasksList.splice(tasksList.findIndex(t => t.index === task.index), 1, editedTask);
-           task = null;
-           displayCollection(collection)
-        })
-        notesDiv.append(submitEdits)
-
-        // expand task card
-        taskDetails.style.visibility = "visible";
-        taskDetails.style.height =  "auto"
-        taskDetails.style.margin = "0.5rem";
-    })
-
+    editButton.addEventListener("click", handleEditTask)
     deleteButton.addEventListener("click", handleDeleteTask)
 
-    taskButtonsDiv.setAttribute("class", "taskButtonDiv");
-    deleteButton.setAttribute("class", "deleteButton");
     taskButtonsDiv.append(expandButton, editButton, deleteButton);
     return taskButtonsDiv;
 }

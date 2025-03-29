@@ -1,4 +1,4 @@
-import { defaultLibrary } from "./classes";
+import { defaultLibrary, toDoTask } from "./classes";
 import { displayCollection, createCollectionMenu, checkForActiveForms } from "./display";
 import { garbagePrep } from "./delete";
 import { createTaskForm } from "./forms";
@@ -119,10 +119,139 @@ function toggleTaskExpand(event) {
     }
 }
 
+function handleEditTask(event){ 
+    event.stopPropagation();
+    if (checkForActiveForms()) {return};
 
-export { handleDeleteCollection, 
+    const editButton = event.target
+    const taskCard = event.target.closest(".taskCard");
+    const dueDate = taskCard.querySelector(".dueDate");
+    const taskDetails = taskCard.querySelector(".taskDetails");
+    const notesDiv = taskCard.querySelector(".notesDiv");
+    const notes = taskCard.querySelector(".taskNotes");
+    const taskTitle = taskCard.querySelector(".taskTitle");
+    const priority = taskCard.querySelector(".priority");
+    const checkDiv = taskCard.querySelector(".checkDiv");
+    // Get task location
+    const collectionInd = parseInt(event.target.getAttribute("collectionind"));
+    const groupInd = parseInt(event.target.getAttribute("groupind"));
+    const taskId = parseInt(event.target.getAttribute("taskid"));
+    const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
+    const group = collection.groupArray.find(group => group.index === groupInd)
+    let task = group.tasksList.find(task => task.index === taskId)
+
+    editButton.style.pointerEvents = 'none';
+    editButton.style.opacity = '0.5';
+
+    // Edit due date
+    const editDueDate = document.createElement("input");
+    const dueDateLab = document.createElement("label");
+    dueDateLab.setAttribute("for", "editDueDate")
+    dueDateLab.innerText = "Due:"
+    Object.assign(editDueDate, {
+        type: "date",
+        id: "editDueDate", 
+        name: "editDueDate",
+        value: task.dueDate
+    })
+    dueDate.innerText = "";
+    dueDate.append(dueDateLab, editDueDate)
+
+    // edit priority
+    const editPriority = document.createElement("select");
+    const priorityLab = document.createElement("label");
+    priorityLab.setAttribute("for", "editPriority")
+    priorityLab.innerText = "Priority: "
+    Object.assign(editPriority, {
+        name: "editPriority",
+        id: "editPriority"
+    })
+    const low = document.createElement("option");
+    const medium = document.createElement("option");
+    const high = document.createElement("option");
+    low.innerText = "Low"
+    low.value = "Low" // Value assignments required to set default selection
+    medium.innerText = "Medium"
+    medium.value = "Medium"
+    high.innerText = "High"
+    high.value = "High"
+    editPriority.append(low, medium, high)
+    editPriority.value = task.priority
+    priority.innerText = "";
+    priority.append(priorityLab, editPriority)
+
+    // Make title, notes, and checklist items editable
+    const editable = [];
+    editable.push(taskTitle, notes, editDueDate) //added date to apply stopPropagation listener
+    const checks = Array.from(checkDiv.getElementsByTagName("label"))
+    checks.forEach(item => {
+        editable.push(item)
+    })
+    editable.forEach(item => {
+        item.contentEditable = true;
+        item.style.borderBottom = "solid white 1px";
+        item.addEventListener("keydown", (e) => {
+            if(e.key === "Enter") {
+                e.preventDefault();
+            }
+        })
+        item.addEventListener("click", (e) => {
+            e.stopPropagation() // stop expand listener from triggering when editing
+        })
+    })
+
+    // Submit button - Apply edits 
+    const submitEdits = document.createElement("button")
+    submitEdits.setAttribute("collectionind", collectionInd)
+    submitEdits.setAttribute("groupind", groupInd)
+    submitEdits.setAttribute("taskid", taskId)
+    submitEdits.classList.add("submitEdits")
+    submitEdits.innerText = "Finished Editing Task"
+    submitEdits.addEventListener("click", submitTaskEdits)
+    notesDiv.append(submitEdits)
+
+    // expand task card
+    taskDetails.style.visibility = "visible";
+    taskDetails.style.height =  "auto"
+    taskDetails.style.margin = "0.5rem";
+}
+
+function submitTaskEdits(event) {
+    // Get task location
+    const collectionInd = parseInt(event.target.getAttribute("collectionind"));
+    const groupInd = parseInt(event.target.getAttribute("groupind"));
+    const taskId = parseInt(event.target.getAttribute("taskid"));
+    const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
+    const group = collection.groupArray.find(group => group.index === groupInd)
+    let task = group.tasksList.find(task => task.index === taskId)
+    // Get edited values
+    const taskCard = event.target.closest(".taskCard");
+    const notes = taskCard.querySelector(".taskNotes");
+    const checkDiv = taskCard.querySelector(".checkDiv");
+    const editedTitle = taskCard.getElementsByClassName("taskTitle")[0].innerText
+    const editedDueDate = taskCard.querySelector("#editDueDate").value
+    const editedPriority= taskCard.querySelector("#editPriority").value
+    const editedNotes = notes.innerText
+    const editedChecklist = Array.from(checkDiv.getElementsByTagName("label"))
+    const editedTask = new toDoTask(editedTitle, editedPriority)
+    editedTask.groupID = task.groupID;
+    editedTask.setDate(editedDueDate);
+    if (editedTask.dueDate.length < 1) {editedTask.dueDate = "None"}
+    editedTask.addNotes(editedNotes);
+    editedChecklist.forEach(input => {
+       editedTask.addChecklistItem(input.innerText)
+    })
+    // replace task
+    const tasksList = group.tasksList
+    tasksList.splice(tasksList.findIndex(t => t.index === task.index), 1, editedTask);
+    task = null;
+    displayCollection(collection)
+ }
+
+export { handleDeleteCollection, // not exported: submitTaskEdits
          handleDeleteGroup,
-         handleDeleteTask, 
+         handleDeleteTask,
+         handleEditTask, 
          displayCollectionFromMenu,
          handleAddNewTask,
          toggleCrossedClass,
