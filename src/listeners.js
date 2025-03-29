@@ -1,7 +1,7 @@
 import { defaultLibrary, toDoTask } from "./classes";
-import { displayCollection, createCollectionMenu, checkForActiveForms } from "./display";
+import { displayCollection, createCollectionMenu, checkForActiveForms, createCheckItem } from "./display";
 import { garbagePrep } from "./delete";
-import { createTaskForm } from "./forms";
+import { createTaskForm, createCheckInput } from "./forms";
 
 // Delete buttons
 
@@ -119,7 +119,61 @@ function toggleTaskExpand(event) {
     }
 }
 
-function handleEditTask(event){ 
+function addChecklistInput(event) {
+    const taskCard = event.target.closest(".taskCard");
+    const taskDetails = taskCard.querySelector(".taskDetails");
+    const checkDiv = taskCard.querySelector(".checkDiv");
+    taskDetails.style.height =  "auto";
+    const subCheck = document.getElementsByClassName("newCheckSubmit")
+    if (subCheck.length < 1) {
+        // Get task location
+        const collectionInd = parseInt(event.target.getAttribute("collectionind"));
+        const groupInd = parseInt(event.target.getAttribute("groupind"));
+        const taskId = parseInt(event.target.getAttribute("taskid"));
+        const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
+        const group = collection.groupArray.find(group => group.index === groupInd)
+        const task = group.tasksList.find(task => task.index === taskId)
+
+        const newCheckSubmit = document.createElement("button");
+        newCheckSubmit.setAttribute("class", "newCheckSubmit")
+        newCheckSubmit.setAttribute("collectionind", collectionInd)
+        newCheckSubmit.setAttribute("groupind", groupInd)
+        newCheckSubmit.setAttribute("taskid", taskId)
+        newCheckSubmit.innerText = "Update Checklist";
+        checkDiv.append(createCheckInput())
+        checkDiv.append(newCheckSubmit)
+        newCheckSubmit.addEventListener("click", submitUpdatedChecklist)
+    } else {
+        checkDiv.insertBefore(createCheckInput(), checkDiv.lastElementChild)
+    }
+}
+
+function submitUpdatedChecklist(event) {
+    // Get task location
+    const collectionInd = parseInt(event.target.getAttribute("collectionind"));
+    const groupInd = parseInt(event.target.getAttribute("groupind"));
+    const taskId = parseInt(event.target.getAttribute("taskid"));
+    const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
+    const group = collection.groupArray.find(group => group.index === groupInd)
+    const task = group.tasksList.find(task => task.index === taskId)
+
+    const taskCard = event.target.closest(".taskCard");
+    const listDiv = taskCard.querySelector(".listDiv");
+    const newCheckSubmit = taskCard.querySelector(".newCheckSubmit");
+    const newChecklistItems = document.querySelectorAll('input[name="newCheckInput"]');
+    newChecklistItems.forEach(input => {
+        task.addChecklistItem(input.value)
+        input.remove();
+    })
+    listDiv.innerHTML = "";
+    const updatedCheckList = task.checklist
+    updatedCheckList.forEach(item => {
+        listDiv.append(createCheckItem(item))
+    })
+    newCheckSubmit.remove()
+}
+
+function handleEditTask(event) { 
     event.stopPropagation();
     if (checkForActiveForms()) {return};
 
@@ -190,14 +244,8 @@ function handleEditTask(event){
     editable.forEach(item => {
         item.contentEditable = true;
         item.style.borderBottom = "solid white 1px";
-        item.addEventListener("keydown", (e) => {
-            if(e.key === "Enter") {
-                e.preventDefault();
-            }
-        })
-        item.addEventListener("click", (e) => {
-            e.stopPropagation() // stop expand listener from triggering when editing
-        })
+        item.addEventListener("keydown", preventEnterKey)
+        item.addEventListener("click", stopPropagationOnClick)
     })
 
     // Submit button - Apply edits 
@@ -214,7 +262,7 @@ function handleEditTask(event){
     taskDetails.style.visibility = "visible";
     taskDetails.style.height =  "auto"
     taskDetails.style.margin = "0.5rem";
-}
+};
 
 function submitTaskEdits(event) {
     // Get task location
@@ -246,14 +294,25 @@ function submitTaskEdits(event) {
     tasksList.splice(tasksList.findIndex(t => t.index === task.index), 1, editedTask);
     task = null;
     displayCollection(collection)
- }
+};
 
-export { handleDeleteCollection, // not exported: submitTaskEdits
+function preventEnterKey(event) {
+    if(event.key === "Enter") {
+        event.preventDefault();
+    }
+};
+
+function stopPropagationOnClick(event) {
+    event.stopPropagation()
+};
+
+export { handleDeleteCollection, // not exported: submitTaskEdits, preventEnterKey, stopPropogationOnClick, submitUpdatedChecklist
          handleDeleteGroup,
          handleDeleteTask,
          handleEditTask, 
          displayCollectionFromMenu,
          handleAddNewTask,
          toggleCrossedClass,
-         toggleTaskExpand }
+         toggleTaskExpand,
+         addChecklistInput }
 

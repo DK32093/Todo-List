@@ -4,7 +4,8 @@ import { collection, defaultLibrary, toDoGroup, toDoTask} from "./classes.js"
 import { createTaskForm, createCheckInput } from "./forms.js";
 import { garbagePrep } from "./delete.js";
 import { handleDeleteCollection, handleDeleteGroup, handleDeleteTask, handleEditTask, 
-         displayCollectionFromMenu, handleAddNewTask, toggleCrossedClass, toggleTaskExpand } from "./listeners.js";
+         displayCollectionFromMenu, handleAddNewTask, toggleCrossedClass, toggleTaskExpand,
+         addChecklistInput } from "./listeners.js";
 import collectionSVG from "./assets/Collection.svg"
 import deleteSVG from "./assets/delete.svg"
 import expandSVG from "./assets/expand.svg"
@@ -158,36 +159,10 @@ function createTaskCard(task, groupInd, collectionInd) {
     notes.innerText = task.notes
     checkTitle.innerText = "Checklist"
     addCheck.innerText = "Add Item"
-    addCheck.addEventListener("click", () => {
-        taskDetails.style.height =  "auto";
-        const subCheck = document.getElementsByClassName("newCheckSubmit")
-        if (subCheck.length < 1) {
-            const newCheckSubmit = document.createElement("button");
-            newCheckSubmit.setAttribute("class", "newCheckSubmit")
-            newCheckSubmit.innerText = "Update Checklist";
-            checkDiv.append(createCheckInput())
-            checkDiv.append(newCheckSubmit)
-            newCheckSubmit.addEventListener("click", () => {
-                const newChecklistItems = document.querySelectorAll('input[name="newCheckInput"]');
-                newChecklistItems.forEach(input => {
-                    task.addChecklistItem(input.value)
-                    input.remove();
-                })
-                listDiv.innerHTML = "";
-                const updatedCheckList = task.checklist
-                updatedCheckList.forEach(item => {
-                    listDiv.append(createCheckItem(item))
-                })
-                
-                newCheckSubmit.remove()
-                console.log(task)
-            })
-        } else {
-            checkDiv.insertBefore(createCheckInput(), checkDiv.lastElementChild)
-        }
-        //submit
-        //task.addChecklistItem(value)
-    })
+    addCheck.setAttribute("collectionind", collectionInd)
+    addCheck.setAttribute("groupind", groupInd)
+    addCheck.setAttribute("taskid", task.index)
+    addCheck.addEventListener("click", addChecklistInput)
     // Classes
     taskCard.setAttribute("class", "taskCard")
     basicView.setAttribute("class", "basicView")
@@ -198,6 +173,7 @@ function createTaskCard(task, groupInd, collectionInd) {
     notesDiv.setAttribute("class", "notesDiv")
     notes.setAttribute("class", "taskNotes")
     checkDiv.setAttribute("class", "checkDiv")
+    listDiv.setAttribute("class", "listDiv")
     // Append elements
     const taskCardButtons = createTaskCardButtons(task, basicView, groupInd, collectionInd)
     basicView.append(taskCheck, taskTitle, dueDate, taskCardButtons)
@@ -313,4 +289,5 @@ export { newCollectionFromForm,
          newTaskFromForm, 
          displayCollection, 
          createCollectionMenu, 
-         checkForActiveForms }
+         checkForActiveForms,
+         createCheckItem }
