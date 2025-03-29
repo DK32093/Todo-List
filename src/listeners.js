@@ -5,6 +5,22 @@ import { createTaskForm } from "./forms";
 
 // Delete buttons
 
+function handleDeleteTask(event) {
+    // Stop propogation once moved to prevent double alert message
+    event.stopPropagation();
+    if (checkForActiveForms()) {return};
+    if (confirm("Are you sure you want to delete this task?")) {
+        const collectionInd = parseInt(event.target.getAttribute("collectionind"));
+        const groupInd = parseInt(event.target.getAttribute("groupind"));
+        const taskId = parseInt(event.target.getAttribute("taskid"));
+        const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
+        const group = collection.groupArray.find(group => group.index === groupInd)
+        const task = group.tasksList.find(task => task.index === taskId)
+        group.deleteTask(task);
+        displayCollection(collection)
+    }
+}
+
 function handleDeleteGroup(event) {
     if (confirm("Are you sure you want to delete this group?")) {
         const collectionInd = parseInt(event.target.getAttribute("collectionind"));
@@ -105,7 +121,8 @@ function toggleTaskExpand(event) {
 
 
 export { handleDeleteCollection, 
-         handleDeleteGroup, 
+         handleDeleteGroup,
+         handleDeleteTask, 
          displayCollectionFromMenu,
          handleAddNewTask,
          toggleCrossedClass,

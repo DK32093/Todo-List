@@ -3,7 +3,7 @@
 import { collection, defaultLibrary, toDoGroup, toDoTask} from "./classes.js"
 import { createTaskForm, createCheckInput } from "./forms.js";
 import { garbagePrep } from "./delete.js";
-import { handleDeleteCollection, handleDeleteGroup, displayCollectionFromMenu, 
+import { handleDeleteCollection, handleDeleteGroup, handleDeleteTask, displayCollectionFromMenu, 
          handleAddNewTask, toggleCrossedClass, toggleTaskExpand } from "./listeners.js";
 import collectionSVG from "./assets/Collection.svg"
 import deleteSVG from "./assets/delete.svg"
@@ -85,7 +85,7 @@ function createGroupCard(group, collectionInd) {
     groupCard.setAttribute("class", "groupCard");
     groupCard.append(title, subTitle, addTaskButton, groupDeleteButton)
     tasksList.forEach(task => {
-        groupCard.append(createTaskCard(task, collectionInd))
+        groupCard.append(createTaskCard(task, groupInd, collectionInd))
     })
     groupDeleteButton.setAttribute("class", "groupDeleteButton");
     groupDeleteButton.setAttribute("collectionind", collectionInd)
@@ -109,7 +109,7 @@ function newGroupFromForm() {
  
 // Tasks
 
-function createTaskCard(task, collectionInd) {
+function createTaskCard(task, groupInd, collectionInd) {
     const taskCard = document.createElement("div");
     // basic view elements
     const basicView = document.createElement("div");
@@ -200,7 +200,7 @@ function createTaskCard(task, collectionInd) {
     const taskCardButtons = createTaskCardButtons(task, taskCard, basicView, 
                                                   taskTitle, dueDate, taskDetails, 
                                                   notesDiv, priority, notes, checkDiv, 
-                                                  collectionInd)
+                                                  groupInd, collectionInd)
     basicView.append(taskCheck, taskTitle, dueDate, taskCardButtons)
     notesDiv.append(priority, notesTitle, notes)
     checkTitleDiv.append(checkTitle, addCheck)
@@ -218,16 +218,21 @@ function createTaskCard(task, collectionInd) {
 
 function createTaskCardButtons(task, taskCard, basicView, taskTitle, 
                                dueDate, taskDetails, notesDiv, priority, 
-                               notes, checkDiv, collectionInd) {
+                               notes, checkDiv, groupInd, collectionInd) {
     const taskButtonsDiv = document.createElement("div");
     const expandButton = document.createElement("img");
     const editButton = document.createElement("img");
     const deleteButton = document.createElement("img");
 
+    // SVGs
     expandButton.setAttribute("src", expandSVG)
     editButton.setAttribute("src", editSVG)
     deleteButton.setAttribute("src", deleteSVG)
 
+    // Attributes
+    deleteButton.setAttribute("collectionind", collectionInd)
+    deleteButton.setAttribute("groupind", groupInd)
+    deleteButton.setAttribute("taskid", task.index)
     expandButton.setAttribute("class", "expandButton")
     
     const expanders = [basicView, expandButton]
@@ -324,17 +329,7 @@ function createTaskCardButtons(task, taskCard, basicView, taskTitle,
         taskDetails.style.margin = "0.5rem";
     })
 
-    deleteButton.addEventListener("click", () => {
-        // Stop propogation once moved to prevent double alert message
-        if (checkForActiveForms()) {return};
-        if (confirm("Are you sure you want to delete this task?")) {
-            const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
-            const group = collection.groupArray.find(group => group.index === task.groupID)
-            group.deleteTask(task);
-            task = null;
-            displayCollection(collection)
-        }
-    })
+    deleteButton.addEventListener("click", handleDeleteTask)
 
     taskButtonsDiv.setAttribute("class", "taskButtonDiv");
     deleteButton.setAttribute("class", "deleteButton");
