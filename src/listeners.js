@@ -162,13 +162,13 @@ function submitUpdatedChecklist(event) {
     const newCheckSubmit = taskCard.querySelector(".newCheckSubmit");
     const newChecklistItems = document.querySelectorAll('input[name="newCheckInput"]');
     newChecklistItems.forEach(input => {
-        task.addChecklistItem(input.value)
+        task.addChecklistItem(input.value) // Update the task object
         input.remove();
     })
     listDiv.innerHTML = "";
     const updatedCheckList = task.checklist
     updatedCheckList.forEach(item => {
-        listDiv.append(createCheckItem(item))
+        if (item) {listDiv.append(createCheckItem(item))} // update the display
     })
     newCheckSubmit.remove()
 }
@@ -179,6 +179,7 @@ function handleEditTask(event) {
 
     const editButton = event.target
     const taskCard = event.target.closest(".taskCard");
+    const basicView = taskCard.querySelector(".basicView");
     const dueDate = taskCard.querySelector(".dueDate");
     const taskDetails = taskCard.querySelector(".taskDetails");
     const notesDiv = taskCard.querySelector(".notesDiv");
@@ -186,6 +187,7 @@ function handleEditTask(event) {
     const taskTitle = taskCard.querySelector(".taskTitle");
     const priority = taskCard.querySelector(".priority");
     const checkDiv = taskCard.querySelector(".checkDiv");
+    const addCheck = taskCard.querySelector(".addCheck");
     // Get task location
     const collectionInd = parseInt(event.target.getAttribute("collectionind"));
     const groupInd = parseInt(event.target.getAttribute("groupind"));
@@ -194,8 +196,14 @@ function handleEditTask(event) {
     const group = collection.groupArray.find(group => group.index === groupInd)
     let task = group.tasksList.find(task => task.index === taskId)
 
-    editButton.style.pointerEvents = 'none';
+    // Disable edit task and add-checklist-item buttons
+    editButton.disabled = true;
     editButton.style.opacity = '0.5';
+    addCheck.disabled = true;
+    addCheck.style.opacity = '0.5';
+
+    // Stop expand event from firing when editing
+    basicView.removeEventListener("click", toggleTaskExpand)
 
     // Edit due date
     const editDueDate = document.createElement("input");
@@ -211,7 +219,7 @@ function handleEditTask(event) {
     dueDate.innerText = "";
     dueDate.append(dueDateLab, editDueDate)
 
-    // edit priority
+    // Edit priority
     const editPriority = document.createElement("select");
     const priorityLab = document.createElement("label");
     priorityLab.setAttribute("for", "editPriority")

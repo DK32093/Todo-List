@@ -173,6 +173,7 @@ function createTaskCard(task, groupInd, collectionInd) {
     notesDiv.setAttribute("class", "notesDiv")
     notes.setAttribute("class", "taskNotes")
     checkDiv.setAttribute("class", "checkDiv")
+    addCheck.setAttribute("class", "addCheck")
     listDiv.setAttribute("class", "listDiv")
     // Append elements
     const taskCardButtons = createTaskCardButtons(task, basicView, groupInd, collectionInd)
@@ -181,7 +182,7 @@ function createTaskCard(task, groupInd, collectionInd) {
     checkTitleDiv.append(checkTitle, addCheck)
     if (checkList) {
         checkList.forEach(item => {
-            listDiv.append(createCheckItem(item))
+            if (item) {listDiv.append(createCheckItem(item))} 
         })
     };
     checkDiv.append(checkTitleDiv, listDiv)
@@ -229,20 +230,22 @@ function createTaskCardButtons(task, basicView, groupInd, collectionInd) {
 }
 
 function createCheckItem(item) {
-    const pair = document.createElement("div")
-    const box = document.createElement("input")
-    const boxLab = document.createElement("label")
-    boxLab.innerText = item
-    boxLab.setAttribute("for", "box")
-    Object.assign(box, {
-        type: "checkbox",
-        name: "box",
-        id: "box",
-    })
-    box.addEventListener("click", toggleCrossedClass)
-    boxLab.addEventListener("click", preventDefaultOnClick)
-    pair.append(box, boxLab)
-    return pair
+    if (item.length > 0) {
+        const pair = document.createElement("div")
+        const box = document.createElement("input")
+        const boxLab = document.createElement("label")
+        boxLab.innerText = item
+        boxLab.setAttribute("for", "box")
+        Object.assign(box, {
+            type: "checkbox",
+            name: "box",
+            id: "box",
+        })
+        box.addEventListener("click", toggleCrossedClass)
+        boxLab.addEventListener("click", preventDefaultOnClick)
+        pair.append(box, boxLab)
+        return pair
+    }
 }
 
 function newTaskFromForm(groupInd, collectionInd) {
