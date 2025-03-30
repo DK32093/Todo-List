@@ -85,13 +85,13 @@ function handleAddNewTask(event) {
 }
 
 function toggleCrossedClass(event) {
-    const taskCheck = event.target
-    const taskCard = event.target.closest(".taskCard")
-    if (taskCheck.checked) {
-        taskCard.classList.add("crossed")
+    const box = event.target
+    const boxLab = box.nextElementSibling
+    if (box.checked) {
+        boxLab.classList.add("crossed")
         return
     }
-    taskCard.classList.remove("crossed");
+    boxLab.classList.remove("crossed");
 }
 
 // Task card buttons
@@ -302,8 +302,12 @@ function preventEnterKey(event) {
     }
 };
 
+function preventDefaultOnClick(event) {
+    event.preventDefault();
+};
+
 function stopPropagationOnClick(event) {
-    event.stopPropagation()
+    event.stopPropagation();
 };
 
 export { handleDeleteCollection, // not exported: submitTaskEdits, preventEnterKey, stopPropogationOnClick, submitUpdatedChecklist
@@ -314,5 +318,6 @@ export { handleDeleteCollection, // not exported: submitTaskEdits, preventEnterK
          handleAddNewTask,
          toggleCrossedClass,
          toggleTaskExpand,
-         addChecklistInput }
+         addChecklistInput,
+         preventDefaultOnClick }
 

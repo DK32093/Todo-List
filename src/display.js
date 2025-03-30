@@ -5,7 +5,7 @@ import { createTaskForm, createCheckInput } from "./forms.js";
 import { garbagePrep } from "./delete.js";
 import { handleDeleteCollection, handleDeleteGroup, handleDeleteTask, handleEditTask, 
          displayCollectionFromMenu, handleAddNewTask, toggleCrossedClass, toggleTaskExpand,
-         addChecklistInput } from "./listeners.js";
+         addChecklistInput, preventDefaultOnClick } from "./listeners.js";
 import collectionSVG from "./assets/Collection.svg"
 import deleteSVG from "./assets/delete.svg"
 import expandSVG from "./assets/expand.svg"
@@ -150,7 +150,7 @@ function createTaskCard(task, groupInd, collectionInd) {
         name: "taskCheck",
         id: "taskCheck",
     })
-    taskCheck.addEventListener("click", toggleCrossedClass);
+    //taskCheck.addEventListener("click", toggleCrossedClass); Update with logic to add completed task to a "completed" collection
     // detailed view params
     taskDetails.style.visibility = "hidden"
     taskDetails.style.height = "0px"
@@ -239,16 +239,8 @@ function createCheckItem(item) {
         name: "box",
         id: "box",
     })
-    box.addEventListener("click", () => {
-        if (box.checked) {
-            boxLab.classList.add("crossed")
-            return
-        }
-        boxLab.classList.remove("crossed");
-    });
-    boxLab.addEventListener("click", (e) => {
-        e.preventDefault(); // Stops box from being checked when label is clicked
-    })
+    box.addEventListener("click", toggleCrossedClass)
+    boxLab.addEventListener("click", preventDefaultOnClick)
     pair.append(box, boxLab)
     return pair
 }
