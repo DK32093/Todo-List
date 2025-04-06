@@ -93,6 +93,15 @@ class toDoTask {
     }
 }
 
+class checklistItem {
+    static index = 0;
+    constructor(text, checked) {
+        this.text = text;
+        this.checked = checked
+        this.index = checklistItem.index++;
+    }
+}
+
 // Defaults
 
 function createDefaultCollection(name) {
@@ -101,8 +110,8 @@ function createDefaultCollection(name) {
     const task = new toDoTask("Task #1", "High")
     const task2 = new toDoTask("Task #2", "Medium")
     const task3 = new toDoTask("Task #3", "Low")
-    task.addChecklistItem("My first checklist item");
-    task.addChecklistItem("My second checklist item");
+    task.addChecklistItem(new checklistItem("My first checklist item", true));
+    task.addChecklistItem(new checklistItem("My second checklist item", false));
     task.addNotes("Don't forget!")
     group.addTask(task)
     group.addTask(task2)
@@ -115,4 +124,4 @@ const defaultLibrary = new library("Default_Library")
 defaultLibrary.addCollection(createDefaultCollection("My Todo Collection"))
 createCollectionMenu(defaultLibrary.collectionArray)
 
-export { library, collection, toDoGroup, toDoTask, defaultLibrary }
+export { library, collection, toDoGroup, toDoTask, checklistItem, defaultLibrary }

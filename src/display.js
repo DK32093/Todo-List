@@ -1,6 +1,6 @@
 // Display functions
 
-import { collection, defaultLibrary, toDoGroup, toDoTask} from "./classes.js"
+import { collection, defaultLibrary, toDoGroup, toDoTask, checklistItem} from "./classes.js"
 import { createTaskForm, createCheckInput } from "./forms.js";
 import { garbagePrep } from "./delete.js";
 import { handleDeleteCollection, handleDeleteGroup, handleDeleteTask, handleEditTask, 
@@ -13,7 +13,7 @@ import editSVG from "./assets/edit.svg"
 
 // Collections
 
-// revesit - the delete button still shows as a detached node
+// revisit - the delete button still shows as a detached node
 function displayCollection(collection) {
     const collectionContainer = document.querySelector("#collectionContainer");
     const groupDisplay = document.querySelector(".groupDisplay");
@@ -230,17 +230,22 @@ function createTaskCardButtons(task, basicView, groupInd, collectionInd) {
 }
 
 function createCheckItem(item) {
-    if (item.length > 0) {
+    if (item.text.length > 0) {
         const pair = document.createElement("div")
         const box = document.createElement("input")
         const boxLab = document.createElement("label")
-        boxLab.innerText = item
+        boxLab.innerText = item.text
         boxLab.setAttribute("for", "box")
+        box.setAttribute("checkid", item.index)
         Object.assign(box, {
             type: "checkbox",
             name: "box",
             id: "box",
         })
+        if (item.checked === true) {
+            boxLab.classList.add("crossed");
+            box.checked = true;
+        }
         box.addEventListener("click", toggleCrossedClass)
         boxLab.addEventListener("click", preventDefaultOnClick)
         pair.append(box, boxLab)
@@ -258,7 +263,7 @@ function newTaskFromForm(groupInd, collectionInd) {
     task.setDate(dueDate);
     task.addNotes(notes);
     checkList.forEach(input => {
-        task.addChecklistItem(input.value)
+        task.addChecklistItem(new checklistItem(input.value, false))
     })
     const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
     const group = collection.groupArray.find(group => group.index === groupInd)

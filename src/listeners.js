@@ -1,4 +1,4 @@
-import { defaultLibrary, toDoTask } from "./classes";
+import { defaultLibrary, toDoTask, checklistItem } from "./classes";
 import { displayCollection, createCollectionMenu, checkForActiveForms, createCheckItem } from "./display";
 import { garbagePrep } from "./delete";
 import { createTaskForm, createCheckInput } from "./forms";
@@ -85,13 +85,34 @@ function handleAddNewTask(event) {
 }
 
 function toggleCrossedClass(event) {
+    if (checkForActiveForms()) {
+        event.target.checked = false;
+        return
+    };
+    //get task location from button attributes
+    const taskCard = event.target.closest(".taskCard");
+    const addCheck = taskCard.querySelector(".addCheck")
+    const collectionInd = parseInt(addCheck.getAttribute("collectionind"));
+    const groupInd = parseInt(addCheck.getAttribute("groupind"));
+    const taskId = parseInt(addCheck.getAttribute("taskid"));
+    const checkID = parseInt(event.target.getAttribute("checkid"))
+    // Use IDs to get objects
+    const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
+    const group = collection.groupArray.find(group => group.index === groupInd)
+    const task = group.tasksList.find(task => task.index === taskId)
+    const checklistItem = task.checklist.find(item => item.index === checkID)
+    // Cross out text and change object checked attribute
     const box = event.target
     const boxLab = box.nextElementSibling
     if (box.checked) {
         boxLab.classList.add("crossed")
+        checklistItem.checked = true;
+        console.log(collection)
         return
     }
     boxLab.classList.remove("crossed");
+    checklistItem.checked = false;
+    console.log(collection)
 }
 
 // Task card buttons
@@ -104,11 +125,12 @@ function toggleTaskExpand(event) {
     const taskDetails  = taskCard.querySelector(".taskDetails");
     const expandButton  = taskCard.querySelector(".expandButton");
     const notesDiv  = taskCard.querySelector(".notesDiv");
+    const checkDiv  = taskCard.querySelector(".checkDiv");
     if (editCheck.length < 1) { //Prevent expanding events while editing
         if (taskDetails.style.visibility === "hidden") {
             expandButton.style.transform = "rotate(180deg)"
             taskDetails.style.visibility = "visible";
-            taskDetails.style.height =  notesDiv.clientHeight + "px";
+            taskDetails.style.height =  checkDiv.clientHeight + "px";
             taskDetails.style.margin = "0.5rem";
             return
         }
@@ -162,7 +184,9 @@ function submitUpdatedChecklist(event) {
     const newCheckSubmit = taskCard.querySelector(".newCheckSubmit");
     const newChecklistItems = document.querySelectorAll('input[name="newCheckInput"]');
     newChecklistItems.forEach(input => {
-        task.addChecklistItem(input.value) // Update the task object
+        if (input.value.length > 0) {
+            task.addChecklistItem(new checklistItem(input.value, false)) // Update the task object
+        }
         input.remove();
     })
     listDiv.innerHTML = "";
@@ -272,7 +296,7 @@ function handleEditTask(event) {
     taskDetails.style.margin = "0.5rem";
 };
 
-function submitTaskEdits(event) {
+function submitTaskEdits(event) { 
     // Get task location
     const collectionInd = parseInt(event.target.getAttribute("collectionind"));
     const groupInd = parseInt(event.target.getAttribute("groupind"));
@@ -280,6 +304,7 @@ function submitTaskEdits(event) {
     const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
     const group = collection.groupArray.find(group => group.index === groupInd)
     let task = group.tasksList.find(task => task.index === taskId)
+    const checklist = task.checklist
     // Get edited values
     const taskCard = event.target.closest(".taskCard");
     const notes = taskCard.querySelector(".taskNotes");
@@ -294,9 +319,11 @@ function submitTaskEdits(event) {
     editedTask.setDate(editedDueDate);
     if (editedTask.dueDate.length < 1) {editedTask.dueDate = "None"}
     editedTask.addNotes(editedNotes);
-    editedChecklist.forEach(input => {
-       editedTask.addChecklistItem(input.innerText)
-    })
+    //update checklist text with edited text
+    checklist.forEach((obj, index) => {
+        obj.text = editedChecklist[index].innerText;
+      });
+    editedTask.checklist = checklist
     // replace task
     const tasksList = group.tasksList
     tasksList.splice(tasksList.findIndex(t => t.index === task.index), 1, editedTask);
