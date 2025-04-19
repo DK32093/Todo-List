@@ -120,8 +120,16 @@ function createDefaultCollection(name) {
     return collection1
 }
 
+function createCompletedCollection(name) {
+    const collection2 = new collection(name)
+    const group = new toDoGroup("All Tasks", "Click the checkbox to undo")
+    collection2.addGroup(group)
+    return collection2
+}
+
 const defaultLibrary = new library("Default_Library")
 defaultLibrary.addCollection(createDefaultCollection("My Todo Collection"))
+defaultLibrary.addCollection(createCompletedCollection("Completed ToDos"))
 createCollectionMenu(defaultLibrary.collectionArray)
 
 export { library, collection, toDoGroup, toDoTask, checklistItem, defaultLibrary }

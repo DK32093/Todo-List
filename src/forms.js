@@ -83,10 +83,12 @@ function createGroupForm() {
     })
     const collections = defaultLibrary.collectionArray
     collections.forEach(collection => {
-        const op = document.createElement("option");
-        op.innerText = collection.name;
-        op.setAttribute("index", collection.index)
-        selectColl.append(op);
+        if (collection.index !== 1) { // not the completed collection
+            const op = document.createElement("option");
+            op.innerText = collection.name;
+            op.setAttribute("index", collection.index)
+            selectColl.append(op);
+        }
     })
 
     const groupSubmitButton = document.createElement("button")
@@ -112,11 +114,14 @@ function updateSelectOptions() {
     const selectColl = document.getElementById("selectColl");
     const collections = defaultLibrary.collectionArray
     selectColl.innerText = "";
+    console.log(collections)
     collections.forEach(collection => {
-        const op = document.createElement("option");
-        op.innerText = collection.name;
-        op.setAttribute("index", collection.index)
-        selectColl.append(op);
+        if (collection.index !== 1) { // not the completed collection
+            const op = document.createElement("option");
+            op.innerText = collection.name;
+            op.setAttribute("index", collection.index)
+            selectColl.append(op);
+        }
     })
 }
 

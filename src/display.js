@@ -52,7 +52,7 @@ function createCollectionMenu(collectionArray) {
     currentMenuItems.forEach(i => {
         i.removeEventListener("click", displayCollectionFromMenu)
     })
-    collectionMenu.innerHTML = "";
+    collectionMenu.innerText = "";
     collectionArray.forEach(c => {
         const newItem = document.createElement("div");
         const title = document.createElement("div")
@@ -61,8 +61,13 @@ function createCollectionMenu(collectionArray) {
         newItem.setAttribute("collectionind", c.index)
         title.innerHTML = c.name;
         svg.setAttribute("src", collectionSVG)
+        const children = collectionMenu.children
         newItem.append(svg, title)
-        collectionMenu.append(newItem);
+        if (children.length > 1) { // Keep completed collection at bottom
+            collectionMenu.insertBefore(newItem, children[children.length -1])
+        } else {
+            collectionMenu.append(newItem);
+        }
         newItem.addEventListener("click", displayCollectionFromMenu)
     })
 }
