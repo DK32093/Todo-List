@@ -271,7 +271,11 @@ function handleEditTask(event) {
     editable.push(taskTitle, notes, editDueDate) //added date to apply stopPropagation listener
     const checks = Array.from(checkDiv.getElementsByTagName("label"))
     checks.forEach(item => {
-        editable.push(item)
+        const box = item.previousElementSibling
+        box.disabled = true
+        if (box.checked == false) {
+            editable.push(item)
+        }
     })
     editable.forEach(item => {
         item.contentEditable = true;
