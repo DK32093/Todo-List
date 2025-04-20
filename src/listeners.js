@@ -3,6 +3,24 @@ import { displayCollection, createCollectionMenu, checkForActiveForms, createChe
 import { garbagePrep } from "./delete";
 import { createTaskForm, createCheckInput } from "./forms";
 
+function handleCompleteTask(event) {
+    event.stopPropagation();
+    if (checkForActiveForms()) {return};
+    const collectionInd = parseInt(event.target.getAttribute("collectionind"));
+    const groupInd = parseInt(event.target.getAttribute("groupind"));
+    const taskId = parseInt(event.target.getAttribute("taskid"));
+    const collection = defaultLibrary.collectionArray.find(collection => collection.index === collectionInd);
+    const group = collection.groupArray.find(group => group.index === groupInd)
+    const task = group.tasksList.find(task => task.index === taskId)
+    const completedCollection = defaultLibrary.collectionArray.find(collection => collection.index === 1);
+    const completedGroup = completedCollection.groupArray.find(group => group.index === 1)
+    const taskClone = structuredClone(task)
+    completedGroup.addTask(taskClone)
+    group.deleteTask(task);
+    displayCollection(collection)
+    console.log(defaultLibrary)
+}
+
 // Delete buttons
 
 function handleDeleteTask(event) {
@@ -192,7 +210,7 @@ function submitUpdatedChecklist(event) {
     listDiv.innerHTML = "";
     const updatedCheckList = task.checklist
     updatedCheckList.forEach(item => {
-        if (item) {listDiv.append(createCheckItem(item))} // update the display
+        if (item) {listDiv.append(createCheckItem(item, groupInd))} // update the display
     })
     newCheckSubmit.remove()
 }
@@ -349,7 +367,8 @@ function stopPropagationOnClick(event) {
     event.stopPropagation();
 };
 
-export { handleDeleteCollection, // not exported: submitTaskEdits, preventEnterKey, stopPropogationOnClick, submitUpdatedChecklist
+export { handleCompleteTask,
+         handleDeleteCollection, // not exported: submitTaskEdits, preventEnterKey, stopPropogationOnClick, submitUpdatedChecklist
          handleDeleteGroup,
          handleDeleteTask,
          handleEditTask, 

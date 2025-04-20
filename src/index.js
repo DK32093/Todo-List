@@ -32,3 +32,4 @@ newGroupButton.addEventListener("click", () => {
 const firstCollection = defaultLibrary.collectionArray[0];
 displayCollection(firstCollection);
 console.log(firstCollection);
+console.log(defaultLibrary)

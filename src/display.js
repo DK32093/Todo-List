@@ -5,7 +5,7 @@ import { createTaskForm, createCheckInput } from "./forms.js";
 import { garbagePrep } from "./delete.js";
 import { handleDeleteCollection, handleDeleteGroup, handleDeleteTask, handleEditTask, 
          displayCollectionFromMenu, handleAddNewTask, toggleCrossedClass, toggleTaskExpand,
-         addChecklistInput, preventDefaultOnClick } from "./listeners.js";
+         addChecklistInput, preventDefaultOnClick, handleCompleteTask } from "./listeners.js";
 import collectionSVG from "./assets/Collection.svg"
 import deleteSVG from "./assets/delete.svg"
 import expandSVG from "./assets/expand.svg"
@@ -89,7 +89,11 @@ function createGroupCard(group, collectionInd) {
     title.textContent = group.groupTitle
     subTitle.textContent = group.subTitle
     groupCard.setAttribute("class", "groupCard");
-    groupCard.append(title, subTitle, addTaskButton, groupDeleteButton)
+    if (groupInd === 1) { // No buttons for completed tasks group
+        groupCard.append(title, subTitle)
+    } else {
+        groupCard.append(title, subTitle, addTaskButton, groupDeleteButton)
+    }
     tasksList.forEach(task => {
         groupCard.append(createTaskCard(task, groupInd, collectionInd))
     })
@@ -155,7 +159,6 @@ function createTaskCard(task, groupInd, collectionInd) {
         name: "taskCheck",
         id: "taskCheck",
     })
-    //taskCheck.addEventListener("click", toggleCrossedClass); Update with logic to add completed task to a "completed" collection
     // detailed view params
     taskDetails.style.visibility = "hidden"
     taskDetails.style.height = "0px"
@@ -164,10 +167,14 @@ function createTaskCard(task, groupInd, collectionInd) {
     notes.innerText = task.notes
     checkTitle.innerText = "Checklist"
     addCheck.innerText = "Add Item"
-    addCheck.setAttribute("collectionind", collectionInd)
-    addCheck.setAttribute("groupind", groupInd)
-    addCheck.setAttribute("taskid", task.index)
+    const assignedButtons = [taskCheck, addCheck]
+    assignedButtons.forEach(button => {
+        button.setAttribute("collectionind", collectionInd)
+        button.setAttribute("groupind", groupInd)
+        button.setAttribute("taskid", task.index)
+    })
     addCheck.addEventListener("click", addChecklistInput)
+    taskCheck.addEventListener("click", handleCompleteTask);
     // Classes
     taskCard.setAttribute("class", "taskCard")
     basicView.setAttribute("class", "basicView")
@@ -184,10 +191,14 @@ function createTaskCard(task, groupInd, collectionInd) {
     const taskCardButtons = createTaskCardButtons(task, basicView, groupInd, collectionInd)
     basicView.append(taskCheck, taskTitle, dueDate, taskCardButtons)
     notesDiv.append(priority, notesTitle, notes)
-    checkTitleDiv.append(checkTitle, addCheck)
+    if (groupInd === 1) {
+        checkTitleDiv.append(checkTitle) //No adding checklist items to completed tasks
+    } else {
+        checkTitleDiv.append(checkTitle, addCheck)
+    }
     if (checkList) {
         checkList.forEach(item => {
-            if (item) {listDiv.append(createCheckItem(item))} 
+            if (item) {listDiv.append(createCheckItem(item, groupInd))} 
         })
     };
     checkDiv.append(checkTitleDiv, listDiv)
@@ -230,11 +241,16 @@ function createTaskCardButtons(task, basicView, groupInd, collectionInd) {
     editButton.addEventListener("click", handleEditTask)
     deleteButton.addEventListener("click", handleDeleteTask)
 
-    taskButtonsDiv.append(expandButton, editButton, deleteButton);
+    if (groupInd === 1) {
+        taskButtonsDiv.append(expandButton);
+    } else {
+        taskButtonsDiv.append(expandButton, editButton, deleteButton);
+    }
+    
     return taskButtonsDiv;
 }
 
-function createCheckItem(item) {
+function createCheckItem(item, groupInd) {
     if (item.text.length > 0) {
         const pair = document.createElement("div")
         const box = document.createElement("input")
@@ -253,6 +269,10 @@ function createCheckItem(item) {
         }
         box.addEventListener("click", toggleCrossedClass)
         boxLab.addEventListener("click", preventDefaultOnClick)
+        if (groupInd === 1) {
+            box.addEventListener("click", preventDefaultOnClick)
+            box.disabled = true;
+        }
         pair.append(box, boxLab)
         return pair
     }

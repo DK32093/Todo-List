@@ -47,7 +47,9 @@ class toDoGroup {
 
     addTask(task) {
         this.tasksList.push(task)
-        task.groupID = this.index
+        if (this.index !== 1) { //tasks added to completed group keep their groupID
+            task.groupID = this.index
+        }
     }
 
     deleteTask(task) {
