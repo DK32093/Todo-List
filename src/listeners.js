@@ -3,6 +3,26 @@ import { displayCollection, createCollectionMenu, checkForActiveForms, createChe
 import { garbagePrep } from "./delete";
 import { createTaskForm, createCheckInput } from "./forms";
 
+// Update and test - trying to retain methods with completed task is cloned
+function deepCloneWithPrototype(obj) {
+
+    // Handle arrays separately
+    if (Array.isArray(obj)) {
+        return obj.map(item => deepCloneWithPrototype(item));
+    }
+
+    // Create a new instance of the object's constructor
+    let clone = Object.create(Object.getPrototypeOf(obj));
+
+    // Recursively copy properties
+    for (let key of Object.keys(obj)) {
+        clone[key] = deepCloneWithPrototype(obj[key]);
+    }
+
+    return clone;
+}
+
+
 function handleCompleteTask(event) {
     event.stopPropagation();
     if (checkForActiveForms()) {return};
@@ -14,10 +34,38 @@ function handleCompleteTask(event) {
     const task = group.tasksList.find(task => task.index === taskId)
     const completedCollection = defaultLibrary.collectionArray.find(collection => collection.index === 1);
     const completedGroup = completedCollection.groupArray.find(group => group.index === 1)
-    const taskClone = structuredClone(task)
+    const taskCloneData = structuredClone(task)
+    const taskClone = new toDoTask(task.title, task.priority)
+    Object.assign(taskClone, taskCloneData)
+    //const taskClone = deepCloneWithPrototype(task)
     completedGroup.addTask(taskClone)
     group.deleteTask(task);
     displayCollection(collection)
+    console.log(defaultLibrary)
+}
+
+function getGroup(groupInd) {
+    for (let collection of defaultLibrary.collectionArray) {
+        const group = collection.groupArray.find(group => group.index === groupInd)
+        if (group) {return group}
+    }
+}
+
+function handleUndoCompleteTask(event) {
+    event.stopPropagation();
+    //const collectionInd = parseInt(event.target.getAttribute("collectionind"));
+    const groupInd = parseInt(event.target.getAttribute("groupind"));
+    const taskId = parseInt(event.target.getAttribute("taskid"));
+    const completedCollection = defaultLibrary.collectionArray.find(collection => collection.index === 1);
+    const completedGroup = completedCollection.groupArray.find(group => group.index === 1)
+    const task = completedGroup.tasksList.find(task => task.index === taskId)
+    const group = getGroup(groupInd)
+    const taskCloneData = structuredClone(task)
+    const taskClone = new toDoTask(task.title, task.priority)
+    Object.assign(taskClone, taskCloneData)
+    group.addTask(taskClone)
+    completedGroup.deleteTask(task);
+    displayCollection(completedCollection)
     console.log(defaultLibrary)
 }
 
@@ -368,6 +416,7 @@ function stopPropagationOnClick(event) {
 };
 
 export { handleCompleteTask,
+         handleUndoCompleteTask,
          handleDeleteCollection, // not exported: submitTaskEdits, preventEnterKey, stopPropogationOnClick, submitUpdatedChecklist
          handleDeleteGroup,
          handleDeleteTask,

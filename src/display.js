@@ -5,7 +5,7 @@ import { createTaskForm, createCheckInput } from "./forms.js";
 import { garbagePrep } from "./delete.js";
 import { handleDeleteCollection, handleDeleteGroup, handleDeleteTask, handleEditTask, 
          displayCollectionFromMenu, handleAddNewTask, toggleCrossedClass, toggleTaskExpand,
-         addChecklistInput, preventDefaultOnClick, handleCompleteTask } from "./listeners.js";
+         addChecklistInput, preventDefaultOnClick, handleCompleteTask, handleUndoCompleteTask } from "./listeners.js";
 import collectionSVG from "./assets/Collection.svg"
 import deleteSVG from "./assets/delete.svg"
 import expandSVG from "./assets/expand.svg"
@@ -19,19 +19,21 @@ function displayCollection(collection) {
     const groupDisplay = document.querySelector(".groupDisplay");
     const collectionHeader = document.querySelector("#collectionHeader");
     const collectionTitle = document.createElement("h1");
-    const deleteCollectionButton = document.createElement("button");
     const collectionArray = defaultLibrary.collectionArray;
     const collectionInd = collection.index;
     const groups = collection.groupArray;
     collectionTitle.innerText = collection.name;
     collectionTitle.setAttribute("id", "collectionTitle")
-    deleteCollectionButton.addEventListener("click", handleDeleteCollection)
-    deleteCollectionButton.innerText = "Delete Collection"
-    deleteCollectionButton.setAttribute("collectionind", collection.index)
     collectionHeader.innerText = "";
     collectionHeader.append(collectionTitle);
     groupDisplay.innerText = "";
-    groupDisplay.append(deleteCollectionButton)
+    if (collectionInd !== 1) { // User can't delete completed collection
+        const deleteCollectionButton = document.createElement("button");
+        deleteCollectionButton.addEventListener("click", handleDeleteCollection)
+        deleteCollectionButton.innerText = "Delete Collection"
+        deleteCollectionButton.setAttribute("collectionind", collection.index)
+        groupDisplay.append(deleteCollectionButton)
+    };
     groups.forEach(group => {
         groupDisplay.append(createGroupCard(group, collectionInd))
     });
@@ -120,6 +122,7 @@ function newGroupFromForm() {
 // Tasks
 
 function createTaskCard(task, groupInd, collectionInd) {
+    //if (groupInd === 1) {groupInd = task.index}
     const taskCard = document.createElement("div");
     // basic view elements
     const basicView = document.createElement("div");
@@ -189,7 +192,16 @@ function createTaskCard(task, groupInd, collectionInd) {
     listDiv.setAttribute("class", "listDiv")
     // Append elements
     const taskCardButtons = createTaskCardButtons(task, basicView, groupInd, collectionInd)
-    basicView.append(taskCheck, taskTitle, dueDate, taskCardButtons)
+    if (groupInd === 1) { // create undo button for completed tasks
+        const undoCompleted = document.createElement("button")
+        undoCompleted.setAttribute("taskid", task.index)
+        undoCompleted.setAttribute("groupind", task.groupID)
+        undoCompleted.addEventListener("click", handleUndoCompleteTask)
+        undoCompleted.innerText = "Undo";
+        basicView.append(taskTitle, dueDate, taskCardButtons, undoCompleted)
+    } else {
+        basicView.append(taskCheck, taskTitle, dueDate, taskCardButtons)
+    }
     notesDiv.append(priority, notesTitle, notes)
     if (groupInd === 1) {
         checkTitleDiv.append(checkTitle) //No adding checklist items to completed tasks
@@ -241,7 +253,7 @@ function createTaskCardButtons(task, basicView, groupInd, collectionInd) {
     editButton.addEventListener("click", handleEditTask)
     deleteButton.addEventListener("click", handleDeleteTask)
 
-    if (groupInd === 1) {
+    if (groupInd === 1) { // only add expand button to completed tasks
         taskButtonsDiv.append(expandButton);
     } else {
         taskButtonsDiv.append(expandButton, editButton, deleteButton);
